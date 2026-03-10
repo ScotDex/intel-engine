@@ -1,3 +1,4 @@
+const { json } = require("stream/consumers");
 const axios = require("./agent");
 const fs = require(`fs`).promises;
 
@@ -58,6 +59,7 @@ class ESIClient{
                 types: Object.fromEntries(this.cache.types),
                 regions: Object.fromEntries(this.cache.regions)
             };
+            const json = JSON.stringify(persistData, null, 2);
             await fs.writeFile(filePath, JSON.stringify(persistData, null, 2));
             this.isDirty = false; // Reset flag after successful save
             console.log("Cache persisted to disk.");
