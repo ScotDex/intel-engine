@@ -66,6 +66,22 @@ class ESIClient{
         }
     }
 
+    async syncToR2(json) {
+        try {const url = `https://api.cloudflare.com/client/v4/accounts/${process.env.CF_ACCOUNT_ID}/r2/buckets/${process.env.CF_CACHE_BUCKET}/objects/esi_cache.json`;
+        await fetch (url, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${process.env.CF_R2_TOKEN}`,
+                'Content-Type': 'application/json'
+            },
+            body: json
+        });
+        } catch (err) {
+        console.error("R2 sync failed:", err.message);
+
+        }
+    }
+
     async loadCache(filePath) {
         try {
             const data = await fs.readFile(filePath, 'utf8');

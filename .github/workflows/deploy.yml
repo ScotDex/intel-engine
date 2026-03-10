@@ -33,6 +33,9 @@ jobs:
             echo "R2_BASE_URL=${{ secrets.R2_BASE_URL }}" >> .env
             echo "BLANKSPACE_HOOK=${{ secrets.BLANKSPACE_HOOK }}" >> .env
             echo "TRIPWIRE_URL=${{ secrets.TRIPWIRE_URL }}" >> .env
+            echo "CF_ACCOUNT_ID=${{ secrets.CF_ACCOUNT_ID }}" >> .env
+            echo "CF_CACHE_BUCKET=${{ secrets.CF_CACHE_BUCKET }}" >> .env
+            echo "CF_R2_TOKEN=${{ secrets.CF_R2_TOKEN }}" >> .env
             git pull
             docker compose down
             docker compose up -d --build
