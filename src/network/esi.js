@@ -60,17 +60,17 @@ class ESIClient{
                 regions: Object.fromEntries(this.cache.regions)
             };
             const json = JSON.stringify(persistData, null, 2);
-            await fs.writeFile(filePath, JSON.stringify(persistData, null, 2));
+            await fs.writeFile(filePath, json);
             this.isDirty = false; // Reset flag after successful save
             console.log("Cache persisted to disk.");
-            await this.syncToR2(json);
+            await this.syncToR2('esi_cache.json',json);
         } catch (err) {
             console.error("Save failed:", err.message);
         }
     }
 
     async syncToR2(key, data) {
-        try {const url = `https://api.cloudflare.com/client/v4/accounts/${process.env.CF_ACCOUNT_ID}/r2/buckets/${process.env.CF_CACHE_BUCKET}/objects/esi_cache.json`;
+        try {const url = `https://api.cloudflare.com/client/v4/accounts/${process.env.CF_ACCOUNT_ID}/r2/buckets/${process.env.CF_CACHE_BUCKET}/objects/${key}`;
         await fetch (url, {
             method: 'PUT',
             headers: {
@@ -79,9 +79,10 @@ class ESIClient{
             },
             body: typeof data === 'string' ? data : JSON.stringify(data)
         });
-        } catch (err) {
-        console.error("R2 sync failed:", err.message);
+            console.log(`[R2] ${key} synced.`);
 
+        } catch (err) {
+        console.error(`[R2] Failed to sync ${key}:`, err.message);
         }
     }
 

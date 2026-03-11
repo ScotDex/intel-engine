@@ -204,7 +204,7 @@ async function r2BackgroundWorker() {
   console.log("Initializing Socket.Kill...");
   await esi.loadSystemCache("./data/systems.json");
   await esi.loadCache(path.join(__dirname, "data", "esi_cache.json"));
-
+  await statsManager.recoverFromR2();
   refreshNebulaBackground();
   processor = ProcessorFactory(esi, io, statsManager);
   syncPlayerCount();
