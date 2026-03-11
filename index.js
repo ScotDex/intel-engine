@@ -206,7 +206,7 @@ async function r2BackgroundWorker() {
   await esi.loadCache(path.join(__dirname, "data", "esi_cache.json"));
 
   refreshNebulaBackground();
-  processor = ProcessorFactory(esi, mapper, io, statsManager);
+  processor = ProcessorFactory(esi, io, statsManager);
   syncPlayerCount();
   
   setInterval(refreshNebulaBackground, ROTATION_SPEED);
@@ -219,7 +219,6 @@ async function r2BackgroundWorker() {
       HeartbeatService.sendReport(
         process.env.MON_WEBHOOK,
         reportStats,
-        mapper,
         esi,
       );
       statsManager.resetSession();
