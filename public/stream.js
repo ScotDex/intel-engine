@@ -277,7 +277,7 @@ socket.on('gatekeeper-stats', (data) => {
 });
 
 socket.on('player-count', (data) => {
-    const display = document.getElementById('player-count');
+    const display = document.getElementById('player-count-header');
     const toast = document.getElementById('player-toast');
     if (data && data.active) {
         toast.classList.remove('d-none');
