@@ -258,6 +258,7 @@ body::after {
     font-weight: bold;
     text-transform: uppercase;
     text-shadow: 0 0 3px rgba(63, 185, 80, 0.2);
+    padding: 0.2rem 0.4rem;
 }
 
 /* === TERMINAL SEARCH BAR === */

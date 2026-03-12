@@ -271,6 +271,8 @@ socket.on('gatekeeper-stats', (data) => {
     if (data.totalIsk) {
         const ticker = document.getElementById("isk-ticker-val");
         if (ticker) ticker.innerText = formatIskShorthand(data.totalIsk);
+        const headerIsk = document.getElementById("isk-ticker-header");
+        if (headerIsk) headerIsk.innerText = formatIskShorthand(data.totalIsk);
     }
 });
 
@@ -280,6 +282,8 @@ socket.on('player-count', (data) => {
     if (data && data.active) {
         toast.classList.remove('d-none');
         display.innerText = data.count.toLocaleString();
+        const headerPlayers = document.getElementById("player-count-header");
+        if (headerPlayers) headerPlayers.innerText = data.count.toLocaleString();
     } else {
         toast.classList.add('d-none');
         display.innerText = "OFFLINE";
