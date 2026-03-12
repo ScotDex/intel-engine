@@ -341,7 +341,7 @@ div.innerHTML = `
         </div>
     </div>
     <div class="kill-meta">
-        <span class="final-blow-label">${kill.attackerCount} attackers</span>
+        <span class="final-blow-label">${kill.attackerCount} attackers </span>
     </div>
     <div class="d-flex align-items-center">
         <div class="corp-square-container me-3">
