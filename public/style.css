@@ -96,8 +96,13 @@
     pointer-events: auto;
 }
 
+#network-toggle {
+    cursor: pointer;
+}
+
 .network-link:hover {
     color: var(--neon-green);
+    text-shadow: 0 0 5px rgba(63, 185, 80, 0.5);
 }
 
 .award-cta {
