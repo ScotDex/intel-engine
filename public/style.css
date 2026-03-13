@@ -71,7 +71,7 @@
 #network-dropdown {
     display: none;
     position: absolute;
-    bottom: calc(100% + 12px);
+    bottom: calc(100% + 15px);
     transform: translateX(-50%);
     bottom: 100%;
     left: 50%;
