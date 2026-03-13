@@ -1,0 +1,35 @@
+const { TwitterService, BlueSkyService } = require("../network/twitterService");
+const CorpIntelFactory = require("../services/corpIntelFactory");
+const axios = require("../network/agent");
+const helpers = require("./helpers");
+
+const WHALE_THRESHOLD = 20000000000;
+
+module.exports = async (killmail, zkb, names) => {
+    if (names.rawValue < WHALE_THRESHOLD) return;
+    await Promise.all([
+        postCorpIntel(killmail, zkb, names),
+        postSocial(names, helpers.formatIsk(names.rawValue), killmail.killmail_id)
+    ]);
+};
+
+async function postCorpIntel(kill, zkb, names) {
+    const payload = CorpIntelFactory.createKillEmbed(kill, zkb, names);
+    try {
+        await axios.post(process.env.BLANKSPACE_HOOK, payload);
+        console.log(`[CORP INTEL] Kill ${kill.killmail_id} posted`);
+    } catch (err) {
+        console.error(`[CORP INTEL] Webhook failed: ${err.message}`);
+    }
+}
+
+async function postSocial(names, formattedValue, killmailId) {
+    try {
+        await Promise.all([
+            TwitterService.postWhale(names, formattedValue, killmailId),
+            BlueSkyService.postWhale(names, formattedValue, killmailId)
+        ]);
+    } catch (err) {
+        console.error(`[SOCIAL] Post failed: ${err.message}`);
+    }
+}

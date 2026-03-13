@@ -1,7 +1,7 @@
 const axios = require("../network/agent"); 
 const helpers = require("./helpers");
-const { TwitterService, BlueSkyService } = require("../network/twitterService");
-const CorpIntelFactory = require("../services/corpIntelFactory");
+const handleWhale = require("../services/whaleModule");
+
 module.exports = (esi, io, statsManager) => {
     
     
@@ -64,58 +64,22 @@ module.exports = (esi, io, statsManager) => {
                 attackerCount: attackerCount
             });
 
-            const isWhale = rawValue >= WHALE_THRESHOLD;
-                               
-
-            if (isWhale) {
-                await handlePrivateIntel(killmail, zkb, {
-                    shipName,
-                    systemName,
-                    charName,
-                    corpName,
-                    rawValue
-                });
-            }
-
-            await handleCorpIntel(killmail, zkb, {
+            if (rawValue >= WHALE_THRESHOLD) {
+                await handleWhale(killmail, zkb, {
                     shipName,
                     systemName,
                     charName,
                     corpName,
                     rawValue,
                     regionName
-            })
-
-        } catch (err) {
+                });
+            }
+                } catch (err) {
             console.error(`[PROCESSOR-ERR] Kill ${killID} failed: ${err.message}`);
         }
     }
 
-    async function handleCorpIntel(kill, zkb, names) {
-        if (names.rawValue < WHALE_THRESHOLD) return;
-        const payload = CorpIntelFactory.createKillEmbed(kill, zkb, names);
-        try {
-            await axios.post(process.env.BLANKSPACE_HOOK, payload)
-            console.log (`[CORP INTEL] Kill ${kill.killmail_id} posted`);
-        } catch (err) {
-            console.error(`[CORP INTEL] Webhook failed: ${err.message}`);
-        }
-        
-    }
-
-    async function handlePrivateIntel(kill, zkb, identity) {
-        const formattedValue = helpers.formatIsk(identity.rawValue);
-        
-        try {
-
-            if (identity.rawValue >= WHALE_THRESHOLD) {
-                TwitterService.postWhale(identity, formattedValue, kill.killmail_id);
-                BlueSkyService.postWhale(identity, formattedValue, kill.killmail_id);
-            }
-        } catch (err) {
-            console.error("Error in handlePrivateIntel:", err.message);
-        }
-    }
-
-    return { processPackage };
+        return { processPackage };
 };
+            
+
