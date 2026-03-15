@@ -1,7 +1,7 @@
 const axios = require("../network/agent"); 
 const helpers = require("./helpers");
 const handleWhale = require("../services/whaleModule");
-
+const { AT_SHIP_IDS, OFFICER_SHIP_IDS } = require('../core/shipIDs');
 
 module.exports = (esi, io, statsManager) => {
     
@@ -36,6 +36,19 @@ module.exports = (esi, io, statsManager) => {
                 ? await esi.getRegionName(systemDetails.region_id) 
                 : "K-Space";
 
+            const triggerAttacker = killmail.attackers?.find(a => AT_SHIP_IDS.has(a.ship_type_id) || OFFICER_SHIP_IDS.has(a.ship_type_id));
+            
+            const [triggerShipName, triggerCharName, triggerCorpName ] = triggerAttacker
+             ? await Promise.all([
+                esi.getTypeName(triggerAttacker.ship_type_id),
+                triggerAttacker.character_id ? esi.getCharacterName(triggerAttacker.character_id) : Promise.resolve("Unknown"),
+                triggerAttacker.corporation_id ? esi.getCorporationName(triggerAttacker.corporation_id) : Promise.resolve("Unknown")
+             ])
+             : [null, null, null];
+
+             const triggerShipId = triggerAttacker?.ship_type_id || null;
+             
+
             const durationMs = Number(process.hrtime.bigint() - startProcessing) / 1_000_000;
             console.log(`[PERF] Kill ${killID} | Latency: ${durationMs.toFixed(3)}ms`);
             io.emit("gatekeeper-stats", { totalScanned: statsManager.getTotal(),
@@ -61,7 +74,8 @@ module.exports = (esi, io, statsManager) => {
                 attackerCount: attackerCount
             });
 
-            
+            // Gated filter for web hooks
+
                 await handleWhale(killmail, zkb, {
                     shipName,
                     systemName,
@@ -70,7 +84,11 @@ module.exports = (esi, io, statsManager) => {
                     rawValue,
                     regionName,
                     finalBlowCorp,
-                    attackerCount
+                    attackerCount,
+                    triggerShipName,
+                    triggerCharName,
+                    triggerCorpName,
+                    triggerShipId
                 });
             
                 } catch (err) {

@@ -5,16 +5,16 @@ class atOfficerFactory {
     static createKillEmbed(kill, zkb, names) {
         const DOTLAN_BASE = 'https://evemaps.dotlan.net'
         const totalValue = helpers.formatIsk(zkb.totalValue)
-        const corpIcon = `https://edge.socketkill.com/favicon.png`;
-        const title = 'Officer / AT Ship Activity Detected';
+        const corpIcon = `https://edge.socketkill.com/taylr/logo.png`;
+        const title = 'Activity Detected';
 
         return {
             username: "Officer/AT Ship Alarm (Beta)",
             avatar_url: corpIcon,
             embeds: [{
                 author: {
-                    name: `${names.charName} lost a ${names.shipName}`,
-                    icon_url: `https://images.evetech.net/characters/${kill.victim.character_id}/portrait?size=128`
+                    name: `${names.triggerShipName} spotted in ${names.systemName}`,
+                    icon_url: `https://images.evetech.net/characters/${names.triggerShipId}/portrait?size=128`
                 },
                 title: title,
                 url: `https://zkillboard.com/kill/${kill.killmail_id}/`,
@@ -23,8 +23,8 @@ class atOfficerFactory {
                 fields: [
                     { name: "System", value: `** [${names.systemName}](${DOTLAN_BASE}/system/${names.systemName.replace(/ /g, '_')}) ** `, inline: false },
                     { name: "Region", value: `** [${names.regionName}](${DOTLAN_BASE}/region/${names.regionName.replace(/ /g, '_')}) ** `, inline: false },
-                    { name: "Corporation", value: names.corpName, inline: false },
-                    { name: "Final Blow", value: names.finalBlowCorp, inline: false },
+                    { name: "Pilot", value: names.triggerCharName, inline: false },
+                    { name: "Corporation", value: names.triggerCorpName, inline: false },
                     { name: "Total Value", value: `**${totalValue} ISK**`, inline: false },
                 ],
                 footer: {
