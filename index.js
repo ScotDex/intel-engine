@@ -2,7 +2,7 @@ require("dotenv").config({ quiet: true });
 const talker = require("./src/network/agent");
 const path = require("path");
 const ESIClient = require("./src/network/esi");
-const HeartbeatService = require("./src/services/heartbeatService");
+// const HeartbeatService = require("./src/services/heartbeatService");
 const startWebServer = require("./src/services/webServer");
 const normalizer = require("./src/core/normalizer");
 const utils = require("./src/core/helpers");
@@ -210,20 +210,20 @@ async function r2BackgroundWorker() {
   syncPlayerCount();
   
   setInterval(refreshNebulaBackground, ROTATION_SPEED);
-  setInterval(() => {
-    statsManager.save();
-  }, 60000);
-  setInterval(
-    () => {
-      const reportStats = statsManager.getStatsForReport();
-      HeartbeatService.sendReport(
-        process.env.MON_WEBHOOK,
-        reportStats,
-        esi,
-      );
-      statsManager.resetSession();
-    },
-    24 * 60 * 60 * 1000,
-  );
+  // setInterval(() => {
+  //   statsManager.save();
+  // }, 60000);
+  // setInterval(
+  //   () => {
+  //     const reportStats = statsManager.getStatsForReport();
+  //     // HeartbeatService.sendReport(
+  //     //   process.env.MON_WEBHOOK,
+  //     //   reportStats,
+  //     //   esi,
+  //     // );
+  //     statsManager.resetSession();
+  //   },
+  //   24 * 60 * 60 * 1000,
+  // );
   r2BackgroundWorker();
 })();
