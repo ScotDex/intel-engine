@@ -1,21 +1,11 @@
-const https = require ('https');
+const http2wrapper = require('http2-wrapper');
 const axios = require ('axios');
 
-const persistentAgent = new https.Agent({
-    keepAlive: true,
-    maxSockets: 32,
-    keepAliveMsecs: 1000,
-    maxFreeSockets: 8,
-    timeout: 60000,
-    scheduling: 'lifo'
-});
-
 const talker = axios.create({
-    httpsAgent: persistentAgent,
+    httpsAgent: new http2wrapper.Agent(),
     timeout: 15000,
     headers:  {
         'Accept-Encoding': 'gzip, deflate, br',
-        'Connection': 'keep-alive',
         'User-Agent': 'Socket.Kill - (@ScottishDex/https://socketkill.com/)',
     }
 });
