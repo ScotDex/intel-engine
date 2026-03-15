@@ -26,7 +26,7 @@ class corpIntelFactory {
             avatar_url: corpIcon,
             embeds: [{
                 author: {
-                    name: `${names.charName} lost a ${names.shipName}`,
+                    name: `${names.finalVictimName} lost a ${names.shipName}`,
                     icon_url: `https://images.evetech.net/characters/${kill.victim.character_id}/portrait?size=128`
                 },
                 title: title,

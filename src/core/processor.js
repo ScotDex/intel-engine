@@ -88,7 +88,8 @@ module.exports = (esi, io, statsManager) => {
                     triggerShipName,
                     triggerCharName,
                     triggerCorpName,
-                    triggerShipId
+                    triggerShipId,
+                    finalVictimName
                 });
             
                 } catch (err) {
