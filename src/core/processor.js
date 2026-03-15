@@ -18,7 +18,7 @@ module.exports = (esi, io, statsManager) => {
                 killmail = esiResponse.data;
             }
             const rawValue = Number(zkb.totalValue) || 0;
-            const [systemDetails, shipName, charName, corpName, finalBlowCorp] = await Promise.allSettled([
+            const [systemDetails, shipName, charName, corpName, finalBlowCorp] = await Promise.all([
                 esi.getSystemDetails(killmail.solar_system_id),
                 esi.getTypeName(killmail.victim.ship_type_id),
                 esi.getCharacterName(killmail.victim?.character_id),
