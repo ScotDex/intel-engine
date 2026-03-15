@@ -28,7 +28,7 @@ async function postCorpIntel(kill, zkb, names) {
     try {
         await Promise.all([
         axios.post(process.env.BLANKSPACE_HOOK, payload),
-        axios.post(process.env.SECOND_HOOK, payload)
+        axios.post(process.env.SECOND_HOOK, payload) // Zoey
         ]);
         console.log(`[CORP INTEL] Kill ${kill.killmail_id} posted`);
     } catch (err) {
