@@ -122,6 +122,10 @@ function type() {
     type();
 };
 const typeShipNameSurgical = (el, text) => {
+    if (document.hidden) {
+        el.innerText = text;
+        return;
+    }
     let i = 0;
     const startTime = performance.now();
     el.classList.add('typewriter-cursor');
@@ -299,6 +303,7 @@ socket.on('nebula-update', (data) => {
 });
 
 socket.on('raw-kill', (kill) => {
+     if (document.hidden) return;
     const prefetchShip = new Image();
     const prefetchCorp = new Image();
     prefetchShip.src = kill.shipImageUrl;

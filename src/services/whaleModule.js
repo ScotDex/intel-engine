@@ -26,7 +26,10 @@ module.exports = async (killmail, zkb, names) => {
 async function postCorpIntel(kill, zkb, names) {
     const payload = CorpIntelFactory.createKillEmbed(kill, zkb, names);
     try {
-        await axios.post(process.env.BLANKSPACE_HOOK, payload);
+        await Promise.all([
+        axios.post(process.env.BLANKSPACE_HOOK, payload),
+        axios.post(process.env.SECOND_HOOK, payload)
+        ]);
         console.log(`[CORP INTEL] Kill ${kill.killmail_id} posted`);
     } catch (err) {
         console.error(`[CORP INTEL] Webhook failed: ${err.message}`);
