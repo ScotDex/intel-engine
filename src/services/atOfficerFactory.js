@@ -1,4 +1,5 @@
 const helpers = require('../core/helpers')
+const { AT_SHIP_IDS, OFFICER_SHIP_IDS } = require('../core/shipIDs');
 
 
 class atOfficerFactory {
