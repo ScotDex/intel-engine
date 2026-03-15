@@ -73,16 +73,13 @@
     position: absolute;
     bottom: calc(100% + 15px);
     transform: translateX(-50%);
-    bottom: 100%;
     left: 50%;
     pointer-events: auto;
-    right: unset;
     background: rgba(10, 12, 16, 0.98);
     border: 1px solid rgba(63, 185, 80, 0.4);
     padding: 6px 0;
     min-width: 160px;
     z-index: 99999;
-    pointer-events: auto;
 }
 
 #network-dropdown.active {
