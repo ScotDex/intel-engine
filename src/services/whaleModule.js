@@ -4,13 +4,15 @@ const axios = require("../network/agent");
 const helpers = require("../core/helpers");
 const atOfficerFactory = require("./atOfficerFactory");
 const { OFFICER_SHIP_IDS } = require ("../core/officerIDs");
+const { AT_SHIP_IDS } = require('../core/allianceIDs');
 
 const WHALE_THRESHOLD = 20000000000;
 
 module.exports = async (killmail, zkb, names) => {
     const isOfficerKill = killmail.attackers?.some(a => OFFICER_SHIP_IDS.has(a.ship_type_id));
+    const isATKill = killmail.attackers?.some(a => AT_SHIP_IDS.has(a.ship_type_id))
 
-    if (isOfficerKill) {
+    if (isOfficerKill || isATKill) {
     await postOfficerIntel(killmail, zkb, names);
     await new Promise(resolve => setTimeout(resolve, 2000));
     }
