@@ -1,18 +1,13 @@
 
-const axios = require("./agent");
+const talker = require("./agent");
 const fs = require(`fs`).promises;
 
 
 class ESIClient{
-    constructor(contactInfo) {
-        this.api = axios.create({
-            baseURL: "https://esi.evetech.net/latest",
-            timeout: 3000,
-            headers: {
-                'User-Agent': `Socket.Kill (${contactInfo})`,
-            }
-        });
-
+    constructor() {
+        this.api = talker;
+        this.baseURL = "https://esi.evetech.net/latest";
+        
         this.cache = {
             characters: new Map(),
             corporations: new Map(),
@@ -39,7 +34,7 @@ class ESIClient{
         }
 
         try {
-            const response = await this.api.get(`${endpoint}/${id}/`);
+            const response = await this.api.get(`${this.baseURL}${endpoint}/${id}/`);
             const name = response.data.name;
             
             if (internalCache) internalCache.set(id, name);
@@ -110,7 +105,7 @@ class ESIClient{
 
     async getCharacterID(name) {
         try {
-            const { data } = await this.api.post('/universe/ids/', [name]);
+            const { data } = await this.api.post(`${this.baseURL}/universe/ids/`, [name]);
             return data.characters?.[0]?.id || null;
         } catch (error) {
             console.error(`Could not resolve ID for ${name}`);
@@ -157,7 +152,7 @@ class ESIClient{
 
     async getRoute(originId, destinationId) {
         try {
-            const { data } = await this.api.get(`/route/${originId}/${destinationId}/`);
+            const { data } = await this.api.get(`${this.baseURL}/route/${originId}/${destinationId}/`);
             return data;
         } catch (error) {
             return null;
