@@ -220,6 +220,12 @@ function selectCurrentSuggestion() {
 // Input handler
 regionSearch.addEventListener('input', (e) => {
     const term = e.target.value.toLowerCase().trim();
+    const header = document.querySelector('.terminal-header');
+    const filterLabel = document.getElementById('active-filter-label');
+
+    header.classList.toggle('filter-active', term !== '');
+    filterLabel.innerText = term ? `// FILTERING: ${term.toUpperCase()}` : '';
+    filterLabel.classList.toggle('active', term !== '');
     
     // Filter kill rows
     const rows = document.querySelectorAll('.kill-row');

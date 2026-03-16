@@ -324,6 +324,22 @@ body::after {
     font-size: 0.875rem;
 }
 
+.filter-label {
+    font-family: var(--mono-font);
+    font-size: 0.75rem;
+    color: var(--neon-green);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    white-space: nowrap;
+    text-shadow: var(--phosphor-glow);
+}
+
+.filter-label.active {
+    opacity: 1;
+}
+
 #status {
     font-size: 0.7rem;
     font-weight: bold;
