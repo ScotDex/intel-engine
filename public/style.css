@@ -15,6 +15,16 @@
                      0 0 1px rgba(255, 255, 255, 0.2);
 }
 
+@font-face {
+    font-family: 'Triglavian';
+    src: url(https://edge.socketkill.com/triglavian-completed.otf) format('opentype');
+}
+
+.triglavian {
+    font-family: 'triglavian';
+    letter-spacing: 2px;
+}
+
 /* Creator Awards Banner */
 .creator-awards-banner {
     position: fixed;
