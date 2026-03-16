@@ -103,6 +103,21 @@ function startWebServer(esi, statsManager, sharedState) {
     }
   });
 
+  app.get('/api/stats', (req, res) => {
+    res.json({
+        totalScanned: statsManager.getTotal(),
+        totalIsk: statsManager.totalIsk,
+        connections: io.engine.clientsCount,
+        uptime: process.uptime(),
+        cache: {
+            characters: esi.cache.characters.size,
+            corporations: esi.cache.corporations.size,
+            types: esi.cache.types.size,
+            regions: esi.cache.regions.size
+        }
+    });
+});
+
   server
     .listen(PORT, () => {
       console.log(`Web Module Loaded on ${PORT}`);
