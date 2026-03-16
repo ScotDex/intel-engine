@@ -489,11 +489,33 @@ body::after {
 
 
 .kill-row:hover {
-    background: rgba(63, 185, 80, 0.03);
-    transform: none;
-    box-shadow: 0 1px 0 rgba(63, 185, 80, 0.3);
-    border-bottom-color: rgba(63, 185, 80, 0.6);
+    /* 1. Use a gradient to simulate the "scanline beam" focusing on the row */
+    background: linear-gradient(
+        90deg, 
+        rgba(63, 185, 80, 0.08) 0%, 
+        rgba(63, 185, 80, 0.02) 50%, 
+        transparent 100%
+    );
+    
+    /* 2. Physicality: Slight "push" into the screen rather than a float */
+    transform: translateX(4px); 
+    
+    /* 3. The "Bloom" Effect: Simulate light bleeding onto the bezel/surrounding pixels */
+    box-shadow: 
+        inset 2px 0 0 var(--neon-green),
+        -5px 0 15px rgba(63, 185, 80, 0.1);
+    
+    border-bottom-color: rgba(63, 185, 80, 0.5);
     z-index: 10;
+    
+    /* 4. CRT Jitter: A very fast, subtle vibration on hover */
+    animation: hover-vibrate 0.1s i-n-f-i-n-i-t-e;
+}
+
+@keyframes hover-vibrate {
+    0% { transform: translateX(4px) translateY(0); }
+    50% { transform: translateX(4.5px) translateY(0.2px); }
+    100% { transform: translateX(4px) translateY(0); }
 }
 
 .kill-row:hover .ship-name {
