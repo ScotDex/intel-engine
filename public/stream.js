@@ -276,12 +276,12 @@ document.addEventListener('click', (e) => {
 
 socket.on('connect', () => {
     status.innerText = "● ONLINE";
-    status.className = "bg-success";
+    status.className = "status-online";
 });
 
 socket.on('disconnect', () => {
     status.innerText = "● OFFLINE";
-    status.className = "bg-danger";
+    status.className = "status-offline";
 });
 
 socket.on('region-list', (regionNames) => {

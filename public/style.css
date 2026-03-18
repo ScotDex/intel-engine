@@ -414,10 +414,13 @@ body::after {
     font-style: italic;
 }
 
-#status.bg-success {
+.status-online {
     color: var(--neon-green);
     text-shadow: 0 0 6px rgba(63, 185, 80, 0.4);
-    animation: none; /* remove the pulse */
+}
+
+.status-offline {
+    color: rgba(255, 80, 80, 0.7);
 }
 
 #kill-counter {
