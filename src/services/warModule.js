@@ -1,7 +1,48 @@
 const r2 = require('../network/r2Writer');
 const talker = require('../network/agent');
-
 const ESI_BASE = 'https://esi.evetech.net/latest';
+
+let activeWars = [];
+
+async function loadWars() {
+    try {
+        const wars = await r2.get('wars.json');
+        if (wars) activeWars = wars;
+        console.log(`[WARS] Loaded ${activeWars.length} active wars`);
+    } catch (err) {
+        console.error(`[WARS] Load failed: ${err.message}`);
+    }
+}
+
+async function pollWarKillmails(processPackage) {
+    const wars = await r2.get('wars.json');
+    if (!wars) return;
+
+    for (const war of wars){
+        try {
+            const res = await talker.get (`${ESI_BASE}/wars/${war.id}/killmails/`);
+            const killpackage = res.data;
+
+            for (const km of killpackage) {
+                const esiRes = await talker.get(
+                    `${ESI_BASE}/killmails/${km.killmail_id}/${km.killmail_hash}/`
+                );
+                
+                // Package in same format as R2 normalizer
+                const killpackage = {
+                    killID: km.killmail_id,
+                    isR2: false,
+                    esiData: esiRes.data,
+                    zkb: { totalValue: 0, href: null }
+                };
+
+                processor.processPackage(package);
+            }
+        } catch (err) {
+            console.error(`[WARS] Poll failed for war ${war.id}: ${err.message}`);
+        }
+    }
+}
 
 async function syncWars() {
     try {
@@ -12,7 +53,7 @@ async function syncWars() {
             warIds.slice(0,100).map(async id => {
                 try {
                 const war = await talker.get (`${ESI_BASE}/wars/${id}/`);
-                return res.data;
+                return war.data;
             } catch {
                 return null;
             }
@@ -27,4 +68,4 @@ async function syncWars() {
 }
 }
 
-module.exports = { syncWars };
+module.exports = { syncWars, loadWars, pollWarKillmails };
