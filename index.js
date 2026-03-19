@@ -83,23 +83,23 @@ const POLLING_CONFIG = {
 
 const processedKills = new Set();
 
-async function r2BackgroundWorker() {
-    // 1. Priming Phase
+// async function r2BackgroundWorker() {
+//     // 1. Priming Phase
     
-    // try {
-    //     const res = await talker.get(SEQUENCE_CACHE_URL, { timeout: 5000 });
-    //     if (res.data?.sequence) {
-    //         sharedState.currentSequence = parseInt(res.data.sequence) - 5;
-    //     } else {
-    //         throw new Error("Invalid sequence data");
-    //     }
-    // } catch (e) {
-    //     const status = e.response?.status;
-    //     lastErrorStatus = status;
-    //     const wait = status === 429 ? POLLING_CONFIG.PANIC_DELAY : 10000;
-    //     console.error(`Priming failed:`, e.response?.status, e.response?.data, e.message);
-    //     return setTimeout(r2BackgroundWorker, wait);
-    // }
+//     // try {
+//     //     const res = await talker.get(SEQUENCE_CACHE_URL, { timeout: 5000 });
+//     //     if (res.data?.sequence) {
+//     //         sharedState.currentSequence = parseInt(res.data.sequence) - 5;
+//     //     } else {
+//     //         throw new Error("Invalid sequence data");
+//     //     }
+//     // } catch (e) {
+//     //     const status = e.response?.status;
+//     //     lastErrorStatus = status;
+//     //     const wait = status === 429 ? POLLING_CONFIG.PANIC_DELAY : 10000;
+//     //     console.error(`Priming failed:`, e.response?.status, e.response?.data, e.message);
+//     //     return setTimeout(r2BackgroundWorker, wait);
+//     // }
 
     try {
       const savedState = await r2BackgroundWorker.get('worker_state.json')
