@@ -6,9 +6,9 @@ const startWebServer = require("./src/services/webServer");
 const normalizer = require("./src/core/normalizer");
 const utils = require("./src/core/helpers");
 const statsManager = require("./src/services/statsManager");
-// const ProcessorFactory = require("./src/core/processor");
 const ProcessorFactory = require("./src/core/processor_v2");
 const esi = new ESIClient("Contact: @ScottishDex");
+const r2 = require('./src/network/r2Writer');
 //const { syncWars, loadWars, pollWarKillmails} = require('./src/services/warModule');
 //const { syncMarketPrices, loadMarketPrices, calculateKillValue } = require('./src/services/priceService');
 
@@ -86,19 +86,41 @@ const processedKills = new Set();
 async function r2BackgroundWorker() {
     // 1. Priming Phase
     
+    // try {
+    //     const res = await talker.get(SEQUENCE_CACHE_URL, { timeout: 5000 });
+    //     if (res.data?.sequence) {
+    //         sharedState.currentSequence = parseInt(res.data.sequence) - 5;
+    //     } else {
+    //         throw new Error("Invalid sequence data");
+    //     }
+    // } catch (e) {
+    //     const status = e.response?.status;
+    //     lastErrorStatus = status;
+    //     const wait = status === 429 ? POLLING_CONFIG.PANIC_DELAY : 10000;
+    //     console.error(`Priming failed:`, e.response?.status, e.response?.data, e.message);
+    //     return setTimeout(r2BackgroundWorker, wait);
+    // }
+
     try {
-        const res = await talker.get(SEQUENCE_CACHE_URL, { timeout: 5000 });
-        if (res.data?.sequence) {
-            sharedState.currentSequence = parseInt(res.data.sequence) - 5;
+      const savedState = await r2BackgroundWorker.get('worker_state.json')
+      if (savedState?.sequence) {
+        sharedState.currentSequence = savedState.sequence;
+        console.log(`[PRIME] Resumed from saved sequence ${savedState.sequence}`);
         } else {
+          const res = await talker.get(SEQUENCE_CACHE_URL, { timeout: 5000 });
+          if (res.data?.sequence) {
+            sharedState.currentSequence = parseInt(res.data.sequence) - 5;
+            console.log(`[PRIME] Cold start from sequence.json at ${sharedState.currentSequence}`);
+          } else {
             throw new Error("Invalid sequence data");
-        }
+          }
+      }
     } catch (e) {
-        const status = e.response?.status;
-        lastErrorStatus = status;
-        const wait = status === 429 ? POLLING_CONFIG.PANIC_DELAY : 10000;
-        console.error(`Priming failed:`, e.response?.status, e.response?.data, e.message);
-        return setTimeout(r2BackgroundWorker, wait);
+      const status = e.response?.status;
+      lastErrorStatus = status;
+      const wait = status === 429 ? POLLING_CONFIG.PANIC_DELAY : 10000;
+      console.error(`Priming failed:`, e.response?.status, e.response?.data, e.message);
+      return setTimeout(r2BackgroundWorker, wait);
     }
 
     // 2. The Centralized Recursive Tick
@@ -138,6 +160,7 @@ async function r2BackgroundWorker() {
 
                 lastKnownSequence = sharedState.currentSequence;
                 sharedState.currentSequence++;
+                if (sharedState.currentSequence % 50 === 0) r2.put('worker_state.json', { sequence: sharedState.currentSequence });
                 consecutive404s = 0;
                 lastSuccessfulIngest = Date.now();
               lastErrorStatus = 200;
