@@ -345,14 +345,6 @@ body::after {
     animation: filter-pulse 2s ease-in-out infinite;
 }
 
-#status {
-    font-family: var(--mono-font);
-    font-size: 0.6rem;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    color: rgba(255, 80, 80, 0.7);
-    transition: color 0.3s ease;
-}
 
 .terminal-header {
     display: flex;
