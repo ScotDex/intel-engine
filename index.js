@@ -221,6 +221,7 @@ async function r2BackgroundWorker() {
         }
         
       }
+      console.log(`[POLL] nextTick: ${nextTick} | sequence: ${sharedState.currentSequence}`);
       setTimeout(poll, nextTick);
     };
 
