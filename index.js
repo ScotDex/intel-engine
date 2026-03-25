@@ -183,13 +183,13 @@ async function r2BackgroundWorker() {
         }
 
         // AFTER
-        if (status === 404) {
+        if (status === 404 || status === 403) {
           try {
             const liveRes = await talker.get(SEQUENCE_CACHE_URL, { timeout: 5000 });
             const liveSeq = liveRes.data?.sequence;
             console.log(`[GAP] Current: ${sharedState.currentSequence} | Live: ${liveSeq} | Behind: ${liveSeq - sharedState.currentSequence} sequences`);
           } catch (_) { }
-          sharedState.currentSequence = lastKnownSequence;
+          
           nextTick = 6000;
         } else {
           nextTick = POLLING_CONFIG.ERROR_BACKOFF;
