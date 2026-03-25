@@ -42,11 +42,9 @@ module.exports = async (killmail, zkb, names) => {
     const isRorqual = killmail.attackers?.some(a => RORQUAL_SHIP_IDS.has(a.ship_type_id))
 
     await postNewsChannel(killmail, zkb, names, 'test');
-    await new Promise (resolve => setTimeout(resolve, 3000))
 
     if (isOfficerKill || isATKill || isRorqual) {
     await postOfficerIntel(killmail, zkb, names);
-    await new Promise(resolve => setTimeout(resolve, 2000));
     }
 
     if (names.rawValue < WHALE_THRESHOLD) return;
