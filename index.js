@@ -189,24 +189,35 @@ async function r2BackgroundWorker() {
         }
 
         // AFTER
+// SURGICAL FIX: Handling 404/403 (Missing or Future Files)
         if (status === 404 || status === 403) {
           try {
             const liveRes = await talker.get(SEQUENCE_CACHE_URL, { timeout: 5000 });
-            const liveSeq = liveRes.data?.sequence;
+            const liveSeq = parseInt(liveRes.data?.sequence);
             const behind = liveSeq - sharedState.currentSequence; 
-            console.log(`[GAP] Current: ${sharedState.currentSequence} | Live: ${liveSeq} | Behind: ${liveSeq - sharedState.currentSequence} sequences`);
-            nextTick = behind > 20 ? 500 : 6000;
-          } catch (_) { }
-          nextTick = 6000;
-          console.log(`[WAIT] Sequence ${sharedState.currentSequence} not yet available. Sleeping 6s.`);
-        } else {
-          console.error(`[POLL] Non-404 error: ${status} | ${err.message}`);
-          nextTick = POLLING_CONFIG.ERROR_BACKOFF;
-        }
-
-        if ((status === 404 || status === 403) && consecutive404s >= 30) {
-          console.warn("[RE-SYNC] 404 limit reached. Re-priming...");
-          return r2BackgroundWorker();
+            
+            console.log(`[GAP] Current: ${sharedState.currentSequence} | Live: ${liveSeq} | Behind: ${behind} sequences`);
+            
+            if (behind > 2) {
+                // If we are behind but 404ing, this is a Ghost File.
+                consecutive404s++; 
+                if (consecutive404s >= 10) {
+                    console.warn(`[SKIP] Seq ${sharedState.currentSequence} is a ghost. Skipping after 10 tries.`);
+                    sharedState.currentSequence++; // The only place we increment on failure
+                    consecutive404s = 0;
+                    nextTick = 0; 
+                } else {
+                    nextTick = 500; // Poll faster to confirm the ghost
+                }
+            } else {
+                // We are at the live tip. Be polite and wait.
+                consecutive404s = 0;
+                nextTick = 6000; 
+            }
+          } catch (_) { 
+            nextTick = 6000;
+          }
+          console.log(`[WAIT] Seq ${sharedState.currentSequence} unavailable. Next poll in ${nextTick/1000}s.`);
         }
       }
       if (Date.now() - workerStart >= 60000) {
