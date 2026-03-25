@@ -217,7 +217,7 @@ async function r2BackgroundWorker() {
           return r2BackgroundWorker();
         } else {
           console.log(`[WORKER] Minute elapsed but ${gap} behind — continuing without restart`);
-          workerStart = Date.now();
+          workerStart - Date.now();
         }
         
       }
