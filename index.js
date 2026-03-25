@@ -200,7 +200,7 @@ async function r2BackgroundWorker() {
             console.log(`[GAP] Current: ${sharedState.currentSequence} | Live: ${liveSeq} | Behind: ${behind} sequences`);
             
             if (behind > 2) {
-                // If we are behind but 404ing, this is a Ghost File.
+               
                 consecutive404s++; 
                 if (consecutive404s >= 10) {
                     console.warn(`[SKIP] Seq ${sharedState.currentSequence} is a ghost. Skipping after 10 tries.`);
