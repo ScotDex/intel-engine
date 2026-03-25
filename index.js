@@ -113,12 +113,13 @@ async function r2BackgroundWorker() {
 
   let lastKnownSequence = sharedState.currentSequence;
   let workerStart = Date.now();
-
+  let isPolling = false;
 
   const MAX_AGE = 24 * 60 * 60 * 1000;
 
     const poll = async () => {
       if (isThrottled) return;
+      isPolling = true;
 
   
       const isNewSequence = sharedState.currentSequence > lastKnownSequence
@@ -235,6 +236,7 @@ async function r2BackgroundWorker() {
         
       }
       console.log(`[POLL] nextTick: ${nextTick} | sequence: ${sharedState.currentSequence}`);
+      isPolling = false;
       setTimeout(poll, nextTick);
     };
 
