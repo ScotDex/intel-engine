@@ -47,11 +47,6 @@ const OFFICER_SHIP_IDS = new Set([
     13654, 13659, 13661, 13667
 ]);
 
-const RORQUAL_SHIP_IDS = new Set([
-    28352
-]);
-
-
 const TRIGLAVIAN_SYSTEMS = new Set([
     30000021, // Kuharah
     30000157, // Otela
@@ -88,4 +83,4 @@ const TRIGLAVIAN_SYSTEMS = new Set([
     32000102, // Unsfgrvaa
 ]);
 
-module.exports = { AT_SHIP_IDS, OFFICER_SHIP_IDS, TRIGLAVIAN_SYSTEMS, RORQUAL_SHIP_IDS };
+module.exports = { AT_SHIP_IDS, OFFICER_SHIP_IDS, TRIGLAVIAN_SYSTEMS };

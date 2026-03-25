@@ -3,7 +3,7 @@ const CorpIntelFactory = require("../services/corpIntelFactory");
 const axios = require("../network/agent");
 const helpers = require("../core/helpers");
 const atOfficerFactory = require("./atOfficerFactory");
-const { AT_SHIP_IDS, OFFICER_SHIP_IDS, RORQUAL_SHIP_IDS } = require('../core/shipIDs');
+const { AT_SHIP_IDS, OFFICER_SHIP_IDS } = require('../core/shipIDs');
 const r2 = require("../network/r2Writer");
 const NewsEmbedFactory = require("./genericFactory");
 
@@ -39,11 +39,9 @@ async function postNewsChannel(kill, zkb, names, category) {
 module.exports = async (killmail, zkb, names) => {
     const isOfficerKill = killmail.attackers?.some(a => OFFICER_SHIP_IDS.has(a.ship_type_id));
     const isATKill = killmail.attackers?.some(a => AT_SHIP_IDS.has(a.ship_type_id))
-    const isRorqual = killmail.attackers?.some(a => RORQUAL_SHIP_IDS.has(a.ship_type_id))
-
     await postNewsChannel(killmail, zkb, names, 'test');
 
-    if (isOfficerKill || isATKill || isRorqual) {
+    if (isOfficerKill || isATKill) {
     await postOfficerIntel(killmail, zkb, names);
     }
 
