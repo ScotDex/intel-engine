@@ -88,4 +88,4 @@ const TRIGLAVIAN_SYSTEMS = new Set([
     32000102, // Unsfgrvaa
 ]);
 
-module.exports = { AT_SHIP_IDS, OFFICER_SHIP_IDS, TRIGLAVIAN_SYSTEMS };
+module.exports = { AT_SHIP_IDS, OFFICER_SHIP_IDS, TRIGLAVIAN_SYSTEMS, RORQUAL_SHIP_IDS };
