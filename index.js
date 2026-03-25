@@ -199,6 +199,7 @@ async function r2BackgroundWorker() {
           sharedState.currentSequence = lastKnownSequence;
           nextTick = 6000;
         } else {
+          console.error(`[POLL] Non-404 error: ${status} | ${err.message}`);
           nextTick = POLLING_CONFIG.ERROR_BACKOFF;
         }
 
