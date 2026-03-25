@@ -207,7 +207,7 @@ async function r2BackgroundWorker() {
                     consecutive404s = 0;
                     nextTick = 0; 
                 } else {
-                    nextTick = 500; // Poll faster to confirm the ghost
+                    nextTick = 500;
                 }
             } else {
                 // We are at the live tip. Be polite and wait.
