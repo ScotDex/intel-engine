@@ -146,7 +146,7 @@ async function r2BackgroundWorker() {
           }
 
                 lastKnownSequence = sharedState.currentSequence;
-                sharedState.currentSequence++;
+                sharedState.currentSequence++
                 consecutive404s = 0;
                 lastSuccessfulIngest = Date.now();
               lastErrorStatus = 200;
@@ -168,7 +168,7 @@ async function r2BackgroundWorker() {
             } else {
                 // DATA GAP: File exists but normalize failed or no kill data
                 consecutive404s++;
-                if (consecutive404s === 1) console.log(`[GAP] Potential ghost file at ${currentSequence}. Retrying...`);
+                if (consecutive404s === 1) console.log(`[GAP] Potential ghost file at ${sharedState.currentSequence}. Retrying...`);
                 nextTick = POLLING_CONFIG.STALL_DELAY;
                 
                 if (consecutive404s >= 5) {
@@ -197,7 +197,8 @@ async function r2BackgroundWorker() {
             console.log(`[GAP] Current: ${sharedState.currentSequence} | Live: ${liveSeq} | Behind: ${liveSeq - sharedState.currentSequence} sequences`);
             nextTick = behind > 20 ? 500 : 6000;
           } catch (_) { }
-          sharedState.currentSequence++;
+          nextTick = 6000;
+          console.log(`[WAIT] Sequence ${sharedState.currentSequence} not yet available. Sleeping 6s.`);
         } else {
           console.error(`[POLL] Non-404 error: ${status} | ${err.message}`);
           nextTick = POLLING_CONFIG.ERROR_BACKOFF;
