@@ -309,7 +309,7 @@ async function startPoller() {
 })();
 
 
-const { app } = startWebServer(esi, statsManager, sharedState);
+const { app } = startWebServer(esi, statsManager);
 
 // After processor is created
 processor = ProcessorFactory(esi, io, statsManager);
