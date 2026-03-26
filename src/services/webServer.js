@@ -22,11 +22,14 @@ function startWebServer(esi, statsManager, sharedState, getProcessor) {
 
   const server = https.createServer(options, app);
 
+  // 1. SECURITY & PARSING MIDDLEWARE
   app.use(
     helmet({
       contentSecurityPolicy: false,
     }),
   );
+  app.use(cors());
+  app.use(express.json());
 
   const io = new Server(server, {
     pingTimeout: 2000,
@@ -47,20 +50,7 @@ function startWebServer(esi, statsManager, sharedState, getProcessor) {
   const PORT = process.env.PORT;
   const publicPath = path.join(__dirname, "..", "..", "public");
 
-  app.use(cors());
-  app.use(express.json());
-  
-
- app.get("/", (req, res) => {
-   res.sendFile(path.join(publicPath, "index.html"));
-  });
-
-  // Socket.io connection logging
-  io.on("connection", (socket) => {
-    console.log(`Client connected to Intel Stream: ${socket.id}`);
-    socket.on("disconnect", () => console.log("Client disconnected"));
-  });
-
+  // 2. API ROUTES (Must be defined before Static/Catch-all)
   app.get("/api/character/search/:name", async (req, res) => {
     console.log(`[API] Character search: ${req.params.name}`);
     try {
@@ -134,7 +124,7 @@ function startWebServer(esi, statsManager, sharedState, getProcessor) {
         console.error(`[REFIRE] Failed for kill ${req.params.killId}: ${err.message}`);
         res.status(500).json({ error: err.message });
     }
-});
+  });
 
   app.get("/api/corporation/:id", async (req, res) => {
     try {
@@ -168,17 +158,28 @@ function startWebServer(esi, statsManager, sharedState, getProcessor) {
             heapUsed: Math.round(mem.heapUsed / 1024 / 1024),
             heapTotal: Math.round(mem.heapTotal / 1024 / 1024)
         }
-
     });
-});
+  });
 
-app.use(express.static(path.join(__dirname, "..", "..", "public")));
+  // 3. STATIC FILES & ROOT (Last priority)
+  app.use(express.static(path.join(__dirname, "..", "..", "public")));
+
+  app.get("/", (req, res) => {
+    res.sendFile(path.join(publicPath, "index.html"));
+  });
+
+  // 4. SOCKET LOGIC
+  io.on("connection", (socket) => {
+    console.log(`Client connected to Intel Stream: ${socket.id}`);
+    socket.on("disconnect", () => console.log("Client disconnected"));
+  });
 
   server
     .listen(PORT, () => {
       console.log(`Web Module Loaded on ${PORT}`);
     })
     .on("error", (err) => {});
+
   return { app, io };
 }
 
