@@ -4,7 +4,7 @@ const FLUSH_INTERVAL = 50;
 
 const cache = new Map();
 let currentDate = todayUTC();
-let addedSinceFlush
+let addedSinceFlush = 0;
 
 function todayUTC(){
     return new Date().toISOString().slice(0, 10);
