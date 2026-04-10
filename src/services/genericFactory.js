@@ -37,16 +37,16 @@ class NewsEmbedFactory {
                     url: `https://images.evetech.net/types/${kill.victim.ship_type_id}/render?size=256`
                 },
                 
-                //thumbnail: {
-                   // url: `https://images.evetech.net/types/${kill.victim.ship_type_id}/render?size=64`
-                //},
+                thumbnail: {
+                    url: `https://edge.socketkill.com/favicon.png`
+                },
                 fields: [
                     { name: "Ship", value: names.shipName, inline: true },
                     { name: "Corporation", value: names.corpName, inline: false},
                     { name: "Value", value: `**${totalValue} ISK**`, inline: true },
-                    { name: "System", value: `**[${names.systemName}](${DOTLAN_BASE}/system/${names.systemName.replace(/ /g, '_')})**`, inline: true },
-                    { name: "Region", value: `**[${names.regionName}](${DOTLAN_BASE}/map/${names.regionName.replace(/ /g, '_')})**`, inline: false },
-                    { name: "Final Blow", value: names.finalBlowCorp, inline: true },
+                    { name: "System", value: `**[${names.systemName}](${DOTLAN_BASE}/system/${names.systemName.replace(/ /g, '_')})**`, inline: false },
+                    { name: "Region", value: `**[${names.regionName}](${DOTLAN_BASE}/map/${names.regionName.replace(/ /g, '_')})**`, inline: true },
+                    { name: "Final Blow", value: names.finalBlowCorp, inline: false },
                 ],
                 footer: {
                     text: "Socket.Kill | Real-time EVE Intel",
