@@ -33,8 +33,9 @@ async function postNewsChannel(kill, zkb, names, category) {
     const urls = channels[category];
     if (!urls || urls.length === 0) return;
     const urlList = Array.isArray(urls) ? urls : [urls];
-    const payload = NewsEmbedFactory.createEmbed(kill, zkb, names, category);
-    const payloadV2 = NewsEmbedFactoryV2.createEmbed(kill, zkb, names, category);
+    const payload = category === 'v2_test'
+        ? NewsEmbedFactoryV2.createEmbed(kill, zkb, names, category)
+        : NewsEmbedFactory.createEmbed(kill, zkb, names, category);
     await Promise.all(
         urlList.map(url => {
             const finalUrl = payload.flags === 32768 ? `${url}?with_components=true` : url;
