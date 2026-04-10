@@ -57,7 +57,7 @@ module.exports = async (killmail, zkb, names) => {
     }
 
     await postNewsChannel(killmail, zkb, names, 'all_kills');
-    await postNewsChannel(killmail, zkb, names, 'v2_test');
+    await postNewsChannelV2(killmail, zkb, names, 'v2_test');
 
     // Centralized Dispatcher
     const categoryPosts = [];
