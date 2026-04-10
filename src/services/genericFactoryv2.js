@@ -37,8 +37,19 @@ class NewsEmbedFactoryV2 {
                         },
                         { type: 14, spacing: 1, divider: false },
                         {
-                            type: 10,
-                            content: `-# Socket.Kill | Real-time EVE Intel · <t:${Math.floor(Date.now() / 1000)}:R>`
+                            type: 9,
+                            components: [
+                                {
+                                    type: 10,
+                                    content: `-# Socket.Kill | Real-time EVE Intel · <t:${Math.floor(Date.now() / 1000)}:R>`
+                                }
+                            ],
+                            accessory: {
+                                type: 11,
+                                media: {
+                                    url: "https://edge.socketkill.com/favicon.png"
+                                }
+                            }
                         }
                     ]
                 }
