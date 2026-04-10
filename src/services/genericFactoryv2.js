@@ -4,14 +4,14 @@ const IS_COMPONENTS_V2 = 1 << 15;
 
 class NewsEmbedFactoryV2 {
     static createEmbed(kill, zkb, names, category) {
-        // Use your helper for that clean "1.25B" look
         const totalValue = helpers.formatIsk(names.rawValue);
         const article = helpers.getArticle(names.shipName);
+        const zkillUrl = `https://zkillboard.com/kill/${kill.killmail_id}/`;
 
-        // Dynamic color based on category/value
-        let accentColor = 0x3fb950; // Default Socket.Kill Green
-        if (category === 'officer' || category === 'at_ships') accentColor = 0xa335ee; // Epic/Purple
-        if (names.rawValue >= 10000000000) accentColor = 0xf1c40f; // Legendary/Gold
+        // Dynamic Branding Colors
+        let accentColor = 0x3fb950; // Socket.Kill Green
+        if (names.rawValue >= 10_000_000_000) accentColor = 0xf1c40f; // Gold for 10B+
+        if (category === 'officer' || category === 'at_ships') accentColor = 0xa335ee; // Purple for Ultra-Rares
 
         return {
             username: "Socket.Kill Intel",
@@ -19,10 +19,10 @@ class NewsEmbedFactoryV2 {
             flags: IS_COMPONENTS_V2,
             components: [
                 {
-                    type: 17, // Section Container
+                    type: 17, // Primary Container
                     accent_color: accentColor,
                     components: [
-                        // HEADER SECTION: Victim and Ship info
+                        // SECTION 1: The Victim & Ship Header
                         {
                             type: 9,
                             components: [
@@ -33,41 +33,45 @@ class NewsEmbedFactoryV2 {
                             ],
                             accessory: {
                                 type: 11,
-                                media: {
-                                    url: `https://images.evetech.net/characters/${kill.victim.character_id}/portrait?size=128`
-                                }
+                                media: { url: `https://images.evetech.net/characters/${kill.victim.character_id}/portrait?size=128` }
                             }
                         },
                         { type: 14, spacing: 1, divider: true },
-                        // INTEL GRID: Tactical and Geographical data
+
+                        // SECTION 2: Tactical Grid (Multi-column content)
                         {
                             type: 9,
                             components: [
                                 {
                                     type: 10,
-                                    content: `**Value**\n${totalValue} ISK\n\n**Attackers**\n${names.attackerCount}`,
+                                    content: `**Economic Impact**\nValue: ${totalValue} ISK\nDropped: ${helpers.formatIsk(zkb.droppedValue || 0)}`
                                 },
                                 {
                                     type: 10,
-                                    content: `**Location**\n${names.systemName}\n\n**Region**\n${names.regionName}`
+                                    content: `**Environment**\nSystem: ${names.systemName}\nRegion: ${names.regionName}`
                                 }
                             ],
                             accessory: {
                                 type: 11,
-                                media: {
-                                    url: `https://images.evetech.net/types/${kill.victim.ship_type_id}/render?size=128`
-                                }
+                                media: { url: `https://images.evetech.net/types/${kill.victim.ship_type_id}/render?size=128` }
                             }
                         },
-                        // FOOTER: Attribution and "Trigger" context
-                        { type: 14, spacing: 1, divider: false },
+
+                        // SECTION 3: Engagement Metadata
+                        { type: 14, spacing: 1, divider: true },
                         {
                             type: 10,
-                            content: `-# **Final Blow:** ${names.finalBlowCorp} | <t:${Math.floor(Date.now() / 1000)}:R>`
+                            content: `**Engagement:** ${names.attackerCount} Attackers | **Final Blow:** ${names.finalBlowCorp}`
+                        },
+
+                        // FOOTER
+                        {
+                            type: 10,
+                            content: `-# socketkill.com | Real-time EVE Intel · <t:${Math.floor(Date.now() / 1000)}:R>`
                         }
                     ]
                 },
-                // ACTION ROW: Production-grade interaction
+                // ACTION ROW: Direct Links
                 {
                     type: 1,
                     components: [
@@ -75,13 +79,13 @@ class NewsEmbedFactoryV2 {
                             type: 2,
                             style: 5,
                             label: "View on zKillboard",
-                            url: `https://zkillboard.com/kill/${kill.killmail_id}/`
+                            url: zkillUrl
                         },
                         {
                             type: 2,
                             style: 5,
-                            label: "External Fit",
-                            url: `https://zkillboard.com/kill/${kill.killmail_id}/#fitting`
+                            label: "Socket.Kill Analysis",
+                            url: `https://socketkill.com/kill/${kill.killmail_id}` // Direct site integration
                         }
                     ]
                 }
