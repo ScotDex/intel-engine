@@ -7,7 +7,6 @@ const { AT_SHIP_IDS, OFFICER_SHIP_IDS, RORQUAL_SHIP_IDS } = require('../core/shi
 const { TITAN_SHIP_IDS, SUPER_SHIP_IDS, TRIGLAVIAN_SYSTEMS } = require('../core/relayShipIDs');
 const r2 = require("../network/r2Writer");
 const NewsEmbedFactory = require("./genericFactory");
-const NewsEmbedFactoryV2 = require("./genericFactoryv2");
 
 let channels = {};
 
@@ -33,9 +32,7 @@ async function postNewsChannel(kill, zkb, names, category) {
     const urls = channels[category];
     if (!urls || urls.length === 0) return;
     const urlList = Array.isArray(urls) ? urls : [urls];
-    const payload = category === 'v2_test'
-        ? NewsEmbedFactoryV2.createEmbed(kill, zkb, names, category)
-        : NewsEmbedFactory.createEmbed(kill, zkb, names, category);
+    const payload = NewsEmbedFactory.createEmbed(kill, zkb, names, category);
     await Promise.all(
         urlList.map(url => {
             const finalUrl = payload.flags === 32768 ? `${url}?with_components=true` : url;
@@ -58,7 +55,6 @@ module.exports = async (killmail, zkb, names) => {
     }
 
     await postNewsChannel(killmail, zkb, names, 'all_kills');
-    await postNewsChannel(killmail, zkb, names, 'v2_test');
 
     // Centralized Dispatcher
     const categoryPosts = [];
