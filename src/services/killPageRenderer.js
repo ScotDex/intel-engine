@@ -54,7 +54,7 @@ function renderKillPage({ killID, killmail, resolved }) {
 <meta property="og:title" content="${escapeHtml(ogTitle)}">
 <meta property="og:description" content="${escapeHtml(ogDesc)}">
 <meta property="og:image" content="${escapeHtml(ogImage)}">
-<meta property="og:url" content="https://socketkill.com/kill/${killmail.killmail_time.slice(0,10)}/${killID}">
+<meta property="og:url" content="https://socketkill.com/kill/${killmail.killmail_time.slice(0, 10)}/${killID}">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="${escapeHtml(ogTitle)}">
 <meta name="twitter:description" content="${escapeHtml(ogDesc)}">
@@ -65,30 +65,32 @@ function renderKillPage({ killID, killmail, resolved }) {
 <h1>${escapeHtml(victimName)} &mdash; ${escapeHtml(victimShip)}</h1>
 <div class="meta">Killmail #${killID} &middot; ${escapeHtml(time)}</div>
 
-<div class="victim-block">
-    <img src="${escapeHtml(ogImage)}" alt="${escapeHtml(victimShip)}">
-    <div>
-        <div><strong>${escapeHtml(victimName)}</strong></div>
-        <div>${escapeHtml(victimCorp)}</div>
-        <div>Lost a <strong>${escapeHtml(victimShip)}</strong></div>
+<div class="kill-container">
+    <header class="kill-header">
+        <h1>...</h1>
+        <div class="meta">...</div>
+    </header>
+    <div class="victim-column">
+        <img ...>
+        <div class="victim-name">...</div>
+        <div class="victim-corp">...</div>
+        <div class="victim-ship">...</div>
     </div>
-</div>
-
-<h2>Location</h2>
-<div>${escapeHtml(systemName)} (${security?.toFixed?.(1) ?? '?'}) &middot; ${escapeHtml(regionName)}</div>
-
-<h2>Final Blow</h2>
-<div>${escapeHtml(finalBlowName)} &middot; ${escapeHtml(finalBlowCorp)} &middot; ${escapeHtml(finalBlowShip)}</div>
-
-<h2>Attackers (${attackerCount})</h2>
-<table>
-    <thead><tr><th>Pilot</th><th>Corporation</th><th>Ship</th><th style="text-align:right">Damage</th></tr></thead>
-    <tbody>${attackerRows}</tbody>
-</table>
-
-<div class="footer">
-    <a href="https://zkillboard.com/kill/${killID}/" rel="noopener">View on zKillboard</a> &middot;
-    <a href="https://socketkill.com/">Socket.Kill</a>
+    <div class="data-column">
+        <div class="data-block location-block">
+            <h2>Location</h2>
+            <div>...</div>
+        </div>
+        <div class="data-block finalblow-block">
+            <h2>Final Blow</h2>
+            <div>...</div>
+        </div>
+        <div class="data-block attackers-block">
+            <h2>Attackers (N)</h2>
+            <table>...</table>
+        </div>
+    </div>
+    <footer class="kill-footer">...</footer>
 </div>
 </body>
 </html>`;
