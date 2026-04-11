@@ -156,8 +156,8 @@ function startWebServer(esi, statsManager, sharedState, getProcessor) {
           characterID: victim.character_id,
           corp: victimCorp,
           corporationID: victim.corporation_id,
-          alliance: victimAlliance,
-          allianceID: victim.alliance_id || null,
+          //alliance: victimAlliance,
+          //allianceID: victim.alliance_id || null,
           ship: victimShip,
           shipTypeID: victim.ship_type_id,
           damageTaken: victim.damage_taken
