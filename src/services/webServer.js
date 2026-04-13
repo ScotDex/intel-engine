@@ -258,7 +258,7 @@ function startWebServer(esi, statsManager, sharedState, getProcessor) {
 
       const r2Package = {
         killID: parseInt(killId),
-        zkb: { totalValue, href: null },
+        zkb: zkillData.zkb,
         isR2: true,
         esiData: esiRes.data
       };
