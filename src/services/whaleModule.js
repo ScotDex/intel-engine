@@ -83,6 +83,7 @@ module.exports = async (killmail, zkb, names) => {
     if (TITAN_SHIP_IDS.has(killmail.victim?.ship_type_id)) categoryPosts.push(postNewsChannel(killmail, zkb, names, 'titan_loss'));
     if (SUPER_SHIP_IDS.has(killmail.victim?.ship_type_id)) categoryPosts.push(postNewsChannel(killmail, zkb, names, 'super_loss'));
     if (TRIGLAVIAN_SYSTEMS.has(killmail.solar_system_id)) categoryPosts.push(postNewsChannel(killmail, zkb, names, 'pochven'));
+    if (zkb.labels?.includes('ganked')) categoryPosts.push(postNewsChannel(killmail, zkb, names, 'ganks'));
     if (categoryPosts.length) await Promise.all(categoryPosts);
 
     if (names.rawValue < WHALE_THRESHOLD) return;

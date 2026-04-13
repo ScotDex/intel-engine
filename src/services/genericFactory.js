@@ -12,6 +12,7 @@ const CATEGORY_CONFIG = {
     titan_loss:       { color: 0x5dade2 },
     super_loss:       { color: 0x5dade2 },
     pochven:          { color: 0x5dade2 },
+    ganks:            { color: 0x5dade2 },
 };
 
 const DOTLAN_BASE = 'https://evemaps.dotlan.net';
