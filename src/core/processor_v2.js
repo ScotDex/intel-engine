@@ -23,10 +23,11 @@ module.exports = (esi, io, statsManager) => {
                 esi.getTypeName(killmail.victim.ship_type_id),
                 esi.getCharacterName(killmail.victim?.character_id),
                 esi.getCorporationName(killmail.victim?.corporation_id),
+                resolveFinalBlowCorp(killmail, esi),
                 killmail.victim?.alliance_id
                     ? esi.getAllianceName(killmail.victim.alliance_id)
                     : Promise.resolve(null),
-                resolveFinalBlowCorp(killmail, esi)
+                
             ]);
             console.log('[DEBUG] finalBlowCorp:', finalBlowCorp);
 
