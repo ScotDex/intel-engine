@@ -1,4 +1,5 @@
 const helpers = require('../core/helpers');
+const { AT_SHIP_IDS, OFFICER_SHIP_IDS, RORQUAL_SHIP_IDS } = require('../core/shipIDs');
 
 const CATEGORY_CONFIG = {
     at_ships:         { color: 0x3fb950 },
@@ -60,6 +61,45 @@ class NewsEmbedFactory {
                 ],
                 footer: {
                     text: "Powered by Socketkill.com",
+                    icon_url: "https://edge.socketkill.com/favicon.png"
+                },
+                timestamp: new Date().toISOString()
+            }]
+        };
+    }
+
+
+    static createActivityEmbed(kill, zkb, names, category) {
+        const config = CATEGORY_CONFIG[category] || { color: 0x3fb950 };
+        const triggerAttacker = kill.attackers?.find(a => 
+            AT_SHIP_IDS.has(a.ship_type_id) || OFFICER_SHIP_IDS.has(a.ship_type_id) || RORQUAL_SHIP_IDS.has(a.ship_type_id) 
+        );
+        return {
+            username: "Socket.Kill Intel",
+            avatar_url: "https://edge.socketkill.com/favicon.png",
+            embeds: [{
+                author: {
+                    name: `${names.triggerShipName || 'Unknown'} spotted in ${names.systemName}`,
+                    icon_url: `https://images.evetech.net/corporations/${triggerAttacker?.corporation_id}/logo?size=64`
+                },
+                url: `${KILLMAIL_BASE}kill/${kill.killmail_id}/`,
+                thumbnail: { url: `https://images.evetech.net/types/${names.triggerShipId}/render?size=256` },
+                color: 0xf39c12,
+                fields: [
+                    { name: "System", value: `**[${names.systemName}](${DOTLAN_BASE}/system/${names.systemName.replace(/ /g, '_')})** `, inline: false },
+                    { name: "Region", value: `**[${names.regionName}](${DOTLAN_BASE}/region/${names.regionName.replace(/ /g, '_')})** `, inline: false },
+                    { name: "Pilot", value: names.triggerCharName || 'Unknown', inline: false },
+                    { name: "Corporation", value: names.triggerCorpName || 'Unknown', inline: false },
+                    {
+                        name: "Alliance",
+                        value: names.allianceName
+                            ? `**[${names.allianceName}](${KILLMAIL_BASE}alliance/${triggerAttacker?.alliance_id}/)**`
+                            : "—",
+                        inline: false
+                    },
+                ],
+                footer: {
+                    text: `Powered by socketkill.com`,
                     icon_url: "https://edge.socketkill.com/favicon.png"
                 },
                 timestamp: new Date().toISOString()

@@ -37,12 +37,18 @@ async function webhookSpacer() {
     lastWebhookAt = Date.now();
 }
 
+const TRACKER_CATEGORIES = new set(['officer', 'at_ships', 'rorqual_activity']);
 
 async function postNewsChannel(kill, zkb, names, category) {
     const urls = channels[category];
     if (!urls || urls.length === 0) return;
     const urlList = Array.isArray(urls) ? urls : [urls];
-    const payload = NewsEmbedFactory.createEmbed(kill, zkb, names, category);
+
+    const payload = TRACKER_CATEGORIES.has(category)
+       ? NewsEmbedFactory.createActivityEmbed(kill, zkb, names, category)
+       : NewsEmbedFactory.createEmbed(kill, zkb, names, category);
+    
+    
     await Promise.all(
         urlList.map(async url => {
             await webhookSpacer();
