@@ -25,6 +25,10 @@ class utils {
     return `https://zkillboard.com/kill/${killId}/`;
   }
 
+  static getSocketKillLink(killId, date) {
+    return `https://socketkill.com/kill/?id=${killId}&date=${date}`;
+  }
+
   static async getPlayerCount() {
     try {
       const url = "https://api.socketkill.com/eve/status";
@@ -42,7 +46,7 @@ class utils {
 
   static async getBackPhoto() {
     try {
-      const url = process.env.BACKGROUND_API_URL; 
+      const url = process.env.BACKGROUND_API_URL;
       return {
         url: url,
         name: "EVE Online Nebula",
