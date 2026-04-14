@@ -17,6 +17,7 @@ const CATEGORY_CONFIG = {
 
 const DOTLAN_BASE = 'https://evemaps.dotlan.net';
 const SOCKETKILL_BASE = `https://socketkill.com/`;
+const KILLMAIL_BASE = `https://zkillboard.com/`;
 
 class NewsEmbedFactory {
     static createEmbed(kill, zkb, names, category) {
