@@ -119,14 +119,14 @@ function startWebServer(esi, statsManager, sharedState, getProcessor) {
       const systemDetails = esi.getSystemDetails(killmail.solar_system_id);
 
       const [
-        victimName, victimCorp, victimShip,
+        victimName, victimCorp, victimAlliance, victimShip,
         finalBlowName, finalBlowCorp, finalBlowShip,
         regionName,
         ...attackerData
       ] = await Promise.all([
         esi.getCharacterName(victim.character_id),
         esi.getCorporationName(victim.corporation_id),
-        //victim.alliance_id ? esi.getAllianceName(victim.alliance_id) : Promise.resolve(null),
+        victim.alliance_id ? esi.getAllianceName(victim.alliance_id) : Promise.resolve(null),
         esi.getTypeName(victim.ship_type_id),
         esi.getCharacterName(finalBlow.character_id),
         esi.getCorporationName(finalBlow.corporation_id),
@@ -139,11 +139,20 @@ function startWebServer(esi, statsManager, sharedState, getProcessor) {
         ])
       ]);
 
+      const damageTaken = victim.damage_taken || 0;
+
       const attackers = killmail.attackers.map((a, i) => ({
         name: attackerData[i * 3],
+        characterID: a.character_id || null,
         corp: attackerData[i * 3 + 1],
+        corporationID: a.corporation_id || null,
+        allianceID: a.alliance_id || null,
         ship: attackerData[i * 3 + 2],
+        shipTypeID: a.ship_type_id || null,
         damage: a.damage_done,
+        damagePercent: damageTaken > 0                            
+                ? Math.round((a.damage_done / damageTaken) * 1000) / 10
+                : 0,
         finalBlow: !!a.final_blow
       }));
 
@@ -151,13 +160,14 @@ function startWebServer(esi, statsManager, sharedState, getProcessor) {
       const payload = {
         killID: id,
         killmailTime: killmail.killmail_time,
+        rawValue: killmailCache.getValue?.(id) || 0,
         victim: {
           name: victimName,
           characterID: victim.character_id,
           corp: victimCorp,
           corporationID: victim.corporation_id,
-          //alliance: victimAlliance,
-          //allianceID: victim.alliance_id || null,
+          alliance: victimAlliance,
+          allianceID: victim.alliance_id || null,
           ship: victimShip,
           shipTypeID: victim.ship_type_id,
           damageTaken: victim.damage_taken
@@ -171,8 +181,11 @@ function startWebServer(esi, statsManager, sharedState, getProcessor) {
         },
         finalBlow: {
           name: finalBlowName,
+          characterID: finalBlow.character_id || null,
           corp: finalBlowCorp,
-          ship: finalBlowShip
+          corporationID:finalBlow.corporation_id || null,
+          ship: finalBlowShip,
+          shipTypeID: finalBlow.ship_type_id || null,
         },
         attackers,
         attackerCount: attackers.length
