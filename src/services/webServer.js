@@ -103,138 +103,143 @@ function startWebServer(esi, statsManager, sharedState, getProcessor) {
     }
   });
 
-  // Kill detail JSON API — returns resolved killmail data for the static frontend
-  app.get('/api/kill/:first/:second?', async (req, res) => {
-    console.log('[KILL ROUTE]', req.params);
-    if (req.params.second) {
-      date = req.params.first;
-      id = parseInt(req.params.second);
+// Kill detail JSON API — supports both /api/kill/:killID and /api/kill/:date/:killID
+async function handleKillDetail(req, res) {
+    let date, id;
+
+    if (req.params.date) {
+        date = req.params.date;
+        id = parseInt(req.params.killID);
     } else {
-      id = parseInt(req.params.first);
-      const now = new Date();
-      for (let i = 0; i < 30; i++) {
-        const d = new Date(now.getTime() - i * 86400000).toISOString().slice(0, 10);
-        if (await hashCache.getHashFromShard(d, id)) {
-          date = d;
-          break;
+        id = parseInt(req.params.killID);
+        const now = new Date();
+        for (let i = 0; i < 30; i++) {
+            const d = new Date(now.getTime() - i * 86400000).toISOString().slice(0, 10);
+            if (await hashCache.getHashFromShard(d, id)) {
+                date = d;
+                break;
+            }
         }
-      }
-      if (!date) return res.status(404).json({ error: 'Kill not found' });
+        if (!date) return res.status(404).json({ error: 'Kill not found' });
     }
+
     if (!Number.isFinite(id) || id <= 0) {
-      return res.status(400).json({ error: 'Invalid killID.' });
+        return res.status(400).json({ error: 'Invalid killID.' });
     }
 
     try {
-      // 1. Hash lookup
-      const hash = await hashCache.getHashFromShard(date, id);
-      if (!hash) {
-        return res.status(404).json({ error: `Kill ${id} not found in archive for ${date}.` });
-      }
+        // 1. Hash lookup
+        const hash = await hashCache.getHashFromShard(date, id);
+        if (!hash) {
+            return res.status(404).json({ error: `Kill ${id} not found in archive for ${date}.` });
+        }
 
-      // 2. Killmail fetch
-      const killmail = await killmailCache.get(id, hash);
-      if (!killmail) {
-        return res.status(502).json({ error: 'Failed to fetch killmail from ESI.' });
-      }
+        // 2. Killmail fetch
+        const killmail = await killmailCache.get(id, hash);
+        if (!killmail) {
+            return res.status(502).json({ error: 'Failed to fetch killmail from ESI.' });
+        }
 
-      // 3. Resolve names
-      const victim = killmail.victim;
-      const finalBlow = killmail.attackers.find(a => a.final_blow) || killmail.attackers[0];
-      const systemDetails = esi.getSystemDetails(killmail.solar_system_id);
+        // 3. Resolve names
+        const victim = killmail.victim;
+        const finalBlow = killmail.attackers.find(a => a.final_blow) || killmail.attackers[0];
+        const systemDetails = esi.getSystemDetails(killmail.solar_system_id);
 
-      const [
-        victimName, victimCorp, victimAlliance, victimShip,
-        finalBlowName, finalBlowCorp, finalBlowShip,
-        regionName, zkb, items,
-        ...attackerData
-      ] = await Promise.all([
-        esi.getCharacterName(victim.character_id),
-        esi.getCorporationName(victim.corporation_id),
-        victim.alliance_id ? esi.getAllianceName(victim.alliance_id) : Promise.resolve(null),
-        esi.getTypeName(victim.ship_type_id),
-        esi.getCharacterName(finalBlow.character_id),
-        esi.getCorporationName(finalBlow.corporation_id),
-        esi.getTypeName(finalBlow.ship_type_id),
-        systemDetails?.region_id ? esi.getRegionName(systemDetails.region_id) : Promise.resolve('K-Space'),
-        fetchZkbMeta(id),
-        resolveItems(victim.items, esi),
-        ...killmail.attackers.flatMap(a => [
-          esi.getCharacterName(a.character_id),
-          esi.getCorporationName(a.corporation_id),
-          esi.getTypeName(a.ship_type_id),
-        ])
-      ]);
+        const [
+            victimName, victimCorp, victimAlliance, victimShip,
+            finalBlowName, finalBlowCorp, finalBlowShip,
+            regionName, zkb, items,
+            ...attackerData
+        ] = await Promise.all([
+            esi.getCharacterName(victim.character_id),
+            esi.getCorporationName(victim.corporation_id),
+            victim.alliance_id ? esi.getAllianceName(victim.alliance_id) : Promise.resolve(null),
+            esi.getTypeName(victim.ship_type_id),
+            esi.getCharacterName(finalBlow.character_id),
+            esi.getCorporationName(finalBlow.corporation_id),
+            esi.getTypeName(finalBlow.ship_type_id),
+            systemDetails?.region_id ? esi.getRegionName(systemDetails.region_id) : Promise.resolve('K-Space'),
+            fetchZkbMeta(id),
+            resolveItems(victim.items, esi),
+            ...killmail.attackers.flatMap(a => [
+                esi.getCharacterName(a.character_id),
+                esi.getCorporationName(a.corporation_id),
+                esi.getTypeName(a.ship_type_id),
+            ])
+        ]);
 
-      const damageTaken = victim.damage_taken || 0;
+        const damageTaken = victim.damage_taken || 0;
 
-      const attackers = killmail.attackers.map((a, i) => ({
-        name: attackerData[i * 3],
-        characterID: a.character_id || null,
-        corp: attackerData[i * 3 + 1],
-        corporationID: a.corporation_id || null,
-        allianceID: a.alliance_id || null,
-        ship: attackerData[i * 3 + 2],
-        shipTypeID: a.ship_type_id || null,
-        damage: a.damage_done,
-        damagePercent: damageTaken > 0
-          ? Math.round((a.damage_done / damageTaken) * 1000) / 10
-          : 0,
-        finalBlow: !!a.final_blow
-      }));
+        const attackers = killmail.attackers.map((a, i) => ({
+            name: attackerData[i * 3],
+            characterID: a.character_id || null,
+            corp: attackerData[i * 3 + 1],
+            corporationID: a.corporation_id || null,
+            allianceID: a.alliance_id || null,
+            ship: attackerData[i * 3 + 2],
+            shipTypeID: a.ship_type_id || null,
+            damage: a.damage_done,
+            damagePercent: damageTaken > 0
+                ? Math.round((a.damage_done / damageTaken) * 1000) / 10
+                : 0,
+            finalBlow: !!a.final_blow
+        }));
 
-      // 4. Build response
-      const payload = {
-        killID: id,
-        killmailTime: killmail.killmail_time,
-        rawValue: zkb?.totalValue || 0,                   // ← new
-        totalValue: zkb?.totalValue ? helpers.formatIsk(zkb.totalValue) : null,
-        droppedValue: zkb?.droppedValue ? helpers.formatIsk(zkb.droppedValue) : null,        // ← new
-        destroyedValue: zkb?.destroyedValue ? helpers.formatIsk(zkb.destroyedValue) : null,  // ← new
-        fittedValue: zkb?.fittedValue ? helpers.formatIsk(zkb.fittedValue) : null,
-        items,
-        victim: {
-          name: victimName,
-          characterID: victim.character_id,
-          corp: victimCorp,
-          corporationID: victim.corporation_id,
-          alliance: victimAlliance,
-          allianceID: victim.alliance_id || null,
-          ship: victimShip,
-          shipTypeID: victim.ship_type_id,
-          damageTaken: victim.damage_taken
-        },
-        system: {
-          id: killmail.solar_system_id,
-          name: systemDetails?.name || 'Unknown System',
-          region: regionName,
-          regionID: systemDetails?.region_id,
-          security: systemDetails?.security_status
-        },
-        finalBlow: {
-          name: finalBlowName,
-          characterID: finalBlow.character_id || null,
-          corp: finalBlowCorp,
-          corporationID: finalBlow.corporation_id || null,
-          ship: finalBlowShip,
-          shipTypeID: finalBlow.ship_type_id || null,
-        },
-        attackers,
-        attackerCount: attackers.length
-      };
+        // 4. Build response
+        const payload = {
+            killID: id,
+            killmailTime: killmail.killmail_time,
+            rawValue: zkb?.totalValue || 0,
+            totalValue: zkb?.totalValue ? helpers.formatIsk(zkb.totalValue) : null,
+            droppedValue: zkb?.droppedValue ? helpers.formatIsk(zkb.droppedValue) : null,
+            destroyedValue: zkb?.destroyedValue ? helpers.formatIsk(zkb.destroyedValue) : null,
+            fittedValue: zkb?.fittedValue ? helpers.formatIsk(zkb.fittedValue) : null,
+            items,
+            victim: {
+                name: victimName,
+                characterID: victim.character_id,
+                corp: victimCorp,
+                corporationID: victim.corporation_id,
+                alliance: victimAlliance,
+                allianceID: victim.alliance_id || null,
+                ship: victimShip,
+                shipTypeID: victim.ship_type_id,
+                damageTaken: victim.damage_taken
+            },
+            system: {
+                id: killmail.solar_system_id,
+                name: systemDetails?.name || 'Unknown System',
+                region: regionName,
+                regionID: systemDetails?.region_id,
+                security: systemDetails?.security_status
+            },
+            finalBlow: {
+                name: finalBlowName,
+                characterID: finalBlow.character_id || null,
+                corp: finalBlowCorp,
+                corporationID: finalBlow.corporation_id || null,
+                ship: finalBlowShip,
+                shipTypeID: finalBlow.ship_type_id || null,
+            },
+            attackers,
+            attackerCount: attackers.length
+        };
 
-      // 5. Cache headers — sealed days are immutable, today short-lived
-      const isToday = date === new Date().toISOString().slice(0, 10);
-      res.set('Cache-Control', isToday
-        ? 'public, max-age=60'
-        : 'public, max-age=31536000, immutable');
-      res.json(payload);
+        // 5. Cache headers
+        const isToday = date === new Date().toISOString().slice(0, 10);
+        res.set('Cache-Control', isToday
+            ? 'public, max-age=60'
+            : 'public, max-age=31536000, immutable');
+        res.json(payload);
 
     } catch (err) {
-      console.error(`[KILL API] Error resolving ${date}/${id}: ${err.message}`);
-      res.status(500).json({ error: 'Internal error resolving killmail.' });
+        console.error(`[KILL API] Error resolving ${date}/${id}: ${err.message}`);
+        res.status(500).json({ error: 'Internal error resolving killmail.' });
     }
-  });
+}
+
+app.get('/api/kill/:killID', handleKillDetail);
+app.get('/api/kill/:date/:killID', handleKillDetail);
 
   app.get("/api/corporation/:id", async (req, res) => {
     try {
