@@ -189,46 +189,6 @@ function startWebServer(esi, statsManager, sharedState, getProcessor) {
       const payload = {
         killID: id,
         killmailTime: killmail.killmail_time,
-        rawValue: zkb?.totalValue || 0,                   // ← new
-        totalValue: zkb?.totalValue ? helpers.formatIsk(zkb.totalValue) : null,
-        droppedValue: zkb?.droppedValue ? helpers.formatIsk(zkb.droppedValue) : null,        // ← new
-        destroyedValue: zkb?.destroyedValue ? helpers.formatIsk(zkb.destroyedValue) : null,  // ← new
-        fittedValue: zkb?.fittedValue ? helpers.formatIsk(zkb.fittedValue) : null,
-
-        items,
-        victim: {
-          name: victimName,
-          characterID: victim.character_id,
-          corp: victimCorp,
-          corporationID: victim.corporation_id,
-          alliance: victimAlliance,
-          allianceID: victim.alliance_id || null,
-          ship: victimShip,
-          shipTypeID: victim.ship_type_id,
-          damageTaken: victim.damage_taken
-        },
-        system: {
-          id: killmail.solar_system_id,
-          name: systemDetails?.name || 'Unknown System',
-          region: regionName,
-          regionID: systemDetails?.region_id,
-          security: systemDetails?.security_status
-        },
-        finalBlow: {
-          name: finalBlowName,
-          characterID: finalBlow.character_id || null,
-          corp: finalBlowCorp,
-          corporationID: finalBlow.corporation_id || null,
-          ship: finalBlowShip,
-          shipTypeID: finalBlow.ship_type_id || null,
-        },
-        attackers,
-        attackerCount: attackers.length
-      };
-      // 4. Build response
-      const payload = {
-        killID: id,
-        killmailTime: killmail.killmail_time,
         rawValue: zkb?.totalValue || 0,
         totalValue: zkb?.totalValue ? helpers.formatIsk(zkb.totalValue) : null,
         droppedValue: zkb?.droppedValue ? helpers.formatIsk(zkb.droppedValue) : null,
