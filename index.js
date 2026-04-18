@@ -265,11 +265,9 @@ async function poll() {
       }
       nextDelay = STALL_DELAY_MS;
     } else if (status === 403) {
-      // --- Blocked: likely user-agent or ban. Log prominently, back off hard ---
       console.error(`[403] Blocked by R2Z2. Check user-agent or visit zKillboard Discord.`);
       nextDelay = THROTTLE_DELAY_MS;
     } else {
-      // --- Unknown error ---
       console.error(`[ERROR] Fetch failed for seq ${state.sequence}: ${status || err.message}`);
       nextDelay = ERROR_DELAY_MS;
     }
