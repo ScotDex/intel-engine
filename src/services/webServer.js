@@ -183,6 +183,7 @@ function startWebServer(esi, statsManager, sharedState, getProcessor) {
         droppedValue: zkb?.droppedValue ? helpers.formatIsk(zkb.droppedValue) : null,        // ← new
         destroyedValue: zkb?.destroyedValue ? helpers.formatIsk(zkb.destroyedValue) : null,  // ← new
         fittedValue: zkb?.fittedValue ? helpers.formatIsk(zkb.fittedValue) : null,
+
         items,
         victim: {
           name: victimName,

@@ -1,14 +1,14 @@
-
+const { getPrice } = require('../services/priceService');
 
 const SLOT_GROUPS = {
-    high:      [27, 28, 29, 30, 31, 32, 33, 34],
-    mid:       [19, 20, 21, 22, 23, 24, 25, 26],
-    low:       [11, 12, 13, 14, 15, 16, 17, 18],
-    rig:       [92, 93, 94],
+    high: [27, 28, 29, 30, 31, 32, 33, 34],
+    mid: [19, 20, 21, 22, 23, 24, 25, 26],
+    low: [11, 12, 13, 14, 15, 16, 17, 18],
+    rig: [92, 93, 94],
     subsystem: [125, 126, 127, 128, 129, 130, 131, 132],
-    drone:     [87],
-    cargo:     [5],
-    fighter:   [158, 159, 160],
+    drone: [87],
+    cargo: [5],
+    fighter: [158, 159, 160],
 };
 
 function groupForFlag(flag) {
@@ -57,6 +57,7 @@ async function resolveItems(rawItems, esi) {
                 dropped,
                 destroyed,
                 quantity: dropped + destroyed,
+                value: getPrice(item.item_type_id),
             });
         }
     }

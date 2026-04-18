@@ -9,18 +9,18 @@ const originalError = console.error;
 const originalWarn = console.warn;
 
 console.log = (...args) => {
-    originalLog(...args);
-    axiom.ingest('socketkill', [{ level: 'info', message: args.join(' '), ts: new Date().toISOString() }]);
+  originalLog(...args);
+  axiom.ingest('socketkill', [{ level: 'info', message: args.join(' '), ts: new Date().toISOString() }]);
 };
 
 console.error = (...args) => {
-    originalError(...args);
-    axiom.ingest('socketkill', [{ level: 'error', message: args.join(' '), ts: new Date().toISOString() }]);
+  originalError(...args);
+  axiom.ingest('socketkill', [{ level: 'error', message: args.join(' '), ts: new Date().toISOString() }]);
 };
 
 console.warn = (...args) => {
-    originalWarn(...args);
-    axiom.ingest('socketkill', [{ level: 'warn', message: args.join(' '), ts: new Date().toISOString() }]);
+  originalWarn(...args);
+  axiom.ingest('socketkill', [{ level: 'warn', message: args.join(' '), ts: new Date().toISOString() }]);
 };
 
 setInterval(() => axiom.flush(), 10000);
@@ -36,6 +36,7 @@ const statsManager = require("./src/services/statsManager");
 const ProcessorFactory = require("./src/core/processor_v2");
 const r2 = require("./src/network/r2Writer");
 const hashCache = require("./src/state/hashCache")
+const { syncMarketPrices, loadMarketPrices } = require("./src/services/priceService");
 
 // --- Constants ---
 
@@ -66,7 +67,7 @@ const state = {
 
 // --- Web Server & Socket ---
 
-const { io, app} = startWebServer(esi, statsManager, state, () => processor);
+const { io, app } = startWebServer(esi, statsManager, state, () => processor);
 
 const startMonitor = require("./src/network/monitor");
 startMonitor(750);
@@ -167,7 +168,7 @@ async function prime() {
   try {
     const saved = await r2.get("worker_state.json");
     if (saved?.sequence) {
-      console.log (`[PRIME] Found saved sequence ${saved.sequence} — validating...`);
+      console.log(`[PRIME] Found saved sequence ${saved.sequence} — validating...`);
       const testUrl = `${R2_BASE_URL}/${saved.sequence}.json`;
       try {
         await talker.get(testUrl, { timeout: 2000 });
@@ -296,9 +297,11 @@ async function startPoller() {
   await esi.loadSystemCache("./data/systems.json");
   await esi.loadCache(path.join(__dirname, "data", "esi_cache.json"));
   await statsManager.recoverFromR2();
+  await loadMarketPrices();
+  setInterval(syncMarketPrices, 60_000);
   processor = ProcessorFactory(esi, io, statsManager);
   await hashCache.prime();                                  // <-- ADD
-  setInterval(() => hashCache.rotateIfNeeded(), 60_000);   
+  setInterval(() => hashCache.rotateIfNeeded(), 60_000);
   refreshNebulaBackground();
   syncPlayerCount();
   setInterval(refreshNebulaBackground, NEBULA_ROTATION_MS);

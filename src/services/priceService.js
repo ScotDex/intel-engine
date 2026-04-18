@@ -1,13 +1,19 @@
+const axios = require('../network/agent');
+const r2 = require('../core/r2');
+
+const ESI_BASE = 'https://esi.evetech.net/latest';
+
+let priceMap = new Map();
 
 async function syncMarketPrices() {
     try {
-        const res = await talker.get(`${ESI_BASE}/markets/prices`, {
+        const res = await axios.get(`${ESI_BASE}/markets/prices`, {
             headers: { 'X-Compatibility-Date': '2025-12-16' }
         });
         await r2.put('market_prices.json', res.data);
-        priceMap = new Map(res.data.map(item => [item.type_id, {
+        priceMap = new Map(res.data.map(item => [item_type_id, {
+            average_price: item.average_price,
             adjusted_price: item.adjusted_price,
-            average_price: item.average_price
         }]));
         console.log(`[MARKET] Synced ${priceMap.size} prices`);
     } catch (err) {
@@ -19,7 +25,7 @@ async function loadMarketPrices() {
     try {
         const data = await r2.get('market_prices.json');
         if (data) {
-            priceMap = new Map(data.map(item => [item.type_id, { adjusted_price: item.adjusted_price, average_price: item.average_price }]));
+            priceMap = new Map(data.map(item => [item_type_id, { adjusted_price: item.adjusted_price, average_price: item.average_price }]));
             console.log(`[MARKET] Loaded ${priceMap.size} prices from R2`);
         } else {
             // Nothing in R2 yet, fetch live
@@ -31,8 +37,8 @@ async function loadMarketPrices() {
 }
 
 function getPrice(typeId) {
-    return priceMap.get(typeId)?.adjusted_price 
-        || priceMap.get(typeId)?.average_price 
+    return priceMap.get(typeId)?.adjusted_price
+        || priceMap.get(typeId)?.average_price
         || 0;
 }
 
