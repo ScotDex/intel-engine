@@ -103,15 +103,26 @@ function startWebServer(esi, statsManager, sharedState, getProcessor) {
     }
   });
 
-  // Kill detail JSON API — returns resolved killmail data for the static frontend
-  app.get('/api/kill/:date/:killID', async (req, res) => {
-    const { date, killID } = req.params;
+  // Kill detail JSON API — supports both /api/kill/:killID and /api/kill/:date/:killID
+  async function handleKillDetail(req, res) {
+    let date, id;
 
-    // Input validation
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
-      return res.status(400).json({ error: 'Invalid date format. Expected YYYY-MM-DD.' });
+    if (req.params.date) {
+      date = req.params.date;
+      id = parseInt(req.params.killID);
+    } else {
+      id = parseInt(req.params.killID);
+      const now = new Date();
+      for (let i = 0; i < 30; i++) {
+        const d = new Date(now.getTime() - i * 86400000).toISOString().slice(0, 10);
+        if (await hashCache.getHashFromShard(d, id)) {
+          date = d;
+          break;
+        }
+      }
+      if (!date) return res.status(404).json({ error: 'Kill not found' });
     }
-    const id = parseInt(killID);
+
     if (!Number.isFinite(id) || id <= 0) {
       return res.status(400).json({ error: 'Invalid killID.' });
     }
@@ -214,8 +225,47 @@ function startWebServer(esi, statsManager, sharedState, getProcessor) {
         attackers,
         attackerCount: attackers.length
       };
+      // 4. Build response
+      const payload = {
+        killID: id,
+        killmailTime: killmail.killmail_time,
+        rawValue: zkb?.totalValue || 0,
+        totalValue: zkb?.totalValue ? helpers.formatIsk(zkb.totalValue) : null,
+        droppedValue: zkb?.droppedValue ? helpers.formatIsk(zkb.droppedValue) : null,
+        destroyedValue: zkb?.destroyedValue ? helpers.formatIsk(zkb.destroyedValue) : null,
+        fittedValue: zkb?.fittedValue ? helpers.formatIsk(zkb.fittedValue) : null,
+        items,
+        victim: {
+          name: victimName,
+          characterID: victim.character_id,
+          corp: victimCorp,
+          corporationID: victim.corporation_id,
+          alliance: victimAlliance,
+          allianceID: victim.alliance_id || null,
+          ship: victimShip,
+          shipTypeID: victim.ship_type_id,
+          damageTaken: victim.damage_taken
+        },
+        system: {
+          id: killmail.solar_system_id,
+          name: systemDetails?.name || 'Unknown System',
+          region: regionName,
+          regionID: systemDetails?.region_id,
+          security: systemDetails?.security_status
+        },
+        finalBlow: {
+          name: finalBlowName,
+          characterID: finalBlow.character_id || null,
+          corp: finalBlowCorp,
+          corporationID: finalBlow.corporation_id || null,
+          ship: finalBlowShip,
+          shipTypeID: finalBlow.ship_type_id || null,
+        },
+        attackers,
+        attackerCount: attackers.length
+      };
 
-      // 5. Cache headers — sealed days are immutable, today short-lived
+      // 5. Cache headers
       const isToday = date === new Date().toISOString().slice(0, 10);
       res.set('Cache-Control', isToday
         ? 'public, max-age=60'
@@ -226,7 +276,10 @@ function startWebServer(esi, statsManager, sharedState, getProcessor) {
       console.error(`[KILL API] Error resolving ${date}/${id}: ${err.message}`);
       res.status(500).json({ error: 'Internal error resolving killmail.' });
     }
-  });
+  }
+
+  app.get('/api/kill/:killID', handleKillDetail);
+  app.get('/api/kill/:date/:killID', handleKillDetail);
 
   app.get("/api/corporation/:id", async (req, res) => {
     try {

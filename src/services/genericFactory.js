@@ -2,17 +2,17 @@ const helpers = require('../core/helpers');
 const { AT_SHIP_IDS, OFFICER_SHIP_IDS, RORQUAL_SHIP_IDS } = require('../core/shipIDs');
 
 const CATEGORY_CONFIG = {
-    at_ships: { color: 0x3fb950 },
+    at_ships: { color: 0xf39c12 },
     rorqual_activity: { color: 0xf39c12 },
-    all_kills: { color: 0x4a4a52 },
-    officer: { color: 0xf39c12 },
-    value_1b: { color: 0x5dade2 },
-    value_10b: { color: 0x5dade2 },
-    value_20b: { color: 0x5dade2 },
-    titan_loss: { color: 0x5dade2 },
-    super_loss: { color: 0x5dade2 },
-    pochven: { color: 0x5dade2 },
-    ganks: { color: 0x5dade2 },
+    all_kills: { color: 0xff6b6b },
+    officer: { color: 0xff6b6b },
+    value_1b: { color: 0xff6b6b },
+    value_10b: { color: 0xff6b6b },
+    value_20b: { color: 0xff6b6b },
+    titan_loss: { color: 0xff6b6b },
+    super_loss: { color: 0xff6b6b },
+    pochven: { color: 0xff6b6b },
+    ganks: { color: 0xff6b6b },
 };
 
 const DOTLAN_BASE = 'https://evemaps.dotlan.net';
@@ -30,7 +30,7 @@ class NewsEmbedFactory {
                 author: {
                     name: `${names.finalVictimName} lost a ${names.shipName}`,
                     icon_url: `https://images.evetech.net/characters/${kill.victim.character_id}/portrait?size=64`,
-                    url: helpers.getSocketKillLink(kill.killmail_id, kill.killmail_time.slice(0, 10))
+                    url: helpers.getSocketKillLink(kill.killmail_id)
                 },
                 color: config.color,
                 thumbnail: {
@@ -39,11 +39,6 @@ class NewsEmbedFactory {
                 fields: [
                     { name: "System", value: `**[${names.systemName}](${DOTLAN_BASE}/system/${names.systemName.replace(/ /g, '_')})** `, inline: false },
                     { name: "Region", value: `**[${names.regionName}](${DOTLAN_BASE}/region/${names.regionName.replace(/ /g, '_')})** `, inline: false },
-                    {
-                        name: "Killmail Details",
-                        value: `**[Final blow: ${names.finalBlowCorp || 'Unknown'} · ${names.attackerCount} ${names.attackerCount === 1 ? 'attacker' : 'attackers'}](${helpers.getSocketKillLink(kill.killmail_id, kill.killmail_time.slice(0, 10))})**`,
-                        inline: false
-                    },
                     {
                         name: "Corporation",
                         value: kill.victim.corporation_id
@@ -58,6 +53,7 @@ class NewsEmbedFactory {
                             : "—",
                         inline: false
                     },
+                    { name: "Final Blow", value: `${names.finalBlowCorp} · ${names.attackerCount} ${names.attackerCount === 1 ? 'attacker' : 'attackers'}`, inline: false },
                     { name: "Value", value: `**${totalValue} ISK**`, inline: false },
                 ],
                 footer: {
@@ -81,16 +77,17 @@ class NewsEmbedFactory {
             embeds: [{
                 author: {
                     name: `${names.triggerShipName || 'Unknown'} spotted in ${names.systemName}`,
-                    icon_url: `https://images.evetech.net/corporations/${triggerAttacker?.corporation_id}/logo?size=64`
+                    icon_url: `https://images.evetech.net/corporations/${triggerAttacker?.corporation_id}/logo?size=64`,
+                    url: helpers.getSocketKillLink(kill.killmail_id)
                 },
-                url: `${KILLMAIL_BASE}kill/${kill.killmail_id}/`,
+
                 thumbnail: { url: `https://images.evetech.net/types/${names.triggerShipId}/render?size=256` },
                 color: 0xf39c12,
                 fields: [
                     { name: "System", value: `**[${names.systemName}](${DOTLAN_BASE}/system/${names.systemName.replace(/ /g, '_')})** `, inline: false },
                     { name: "Region", value: `**[${names.regionName}](${DOTLAN_BASE}/region/${names.regionName.replace(/ /g, '_')})** `, inline: false },
-                    { name: "Pilot", value: names.triggerCharName || 'Unknown', inline: false },
-                    { name: "Corporation", value: names.triggerCorpName || 'Unknown', inline: false },
+                    { name: "Pilot", value: names.triggerCharName ? `**[${names.triggerCharName}](https://zkillboard.com/character/${triggerAttacker?.character_id}/)**` : 'Unknown', inline: false },
+                    { name: "Corporation", value: names.triggerCorpName ? `**[${names.triggerCorpName}](https://zkillboard.com/corporation/${triggerAttacker?.corporation_id}/)**` : 'Unknown', inline: false },
                     {
                         name: "Alliance",
                         value: names.allianceName
@@ -98,9 +95,10 @@ class NewsEmbedFactory {
                             : "—",
                         inline: false
                     },
+                    { name: "Value", value: `**${helpers.formatIsk(zkb.totalValue)} ISK**`, inline: false },
                 ],
                 footer: {
-                    text: `Powered by socketkill.com`,
+                    text: `Powered by Socketkill.com`,
                     icon_url: "https://edge.socketkill.com/favicon.png"
                 },
                 timestamp: new Date().toISOString()
