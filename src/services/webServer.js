@@ -188,6 +188,7 @@ function startWebServer(esi, statsManager, sharedState, getProcessor) {
       // 4. Build response
       const payload = {
         killID: id,
+        killmailHash: hash,
         killmailTime: killmail.killmail_time,
         rawValue: zkb?.totalValue || 0,
         totalValue: zkb?.totalValue ? helpers.formatIsk(zkb.totalValue) : null,
