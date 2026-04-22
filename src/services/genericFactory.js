@@ -24,7 +24,7 @@ class NewsEmbedFactory {
         const totalValue = helpers.formatIsk(zkb.totalValue);
 
         return {
-            username: "Socket.Kill Intel",
+            username: "Socketkill.com",
             avatar_url: "https://edge.socketkill.com/favicon.png",
             embeds: [{
                 author: {
@@ -72,7 +72,7 @@ class NewsEmbedFactory {
             AT_SHIP_IDS.has(a.ship_type_id) || OFFICER_SHIP_IDS.has(a.ship_type_id) || RORQUAL_SHIP_IDS.has(a.ship_type_id)
         );
         return {
-            username: "Socket.Kill Intel",
+            username: "Socketkill.com",
             avatar_url: "https://edge.socketkill.com/favicon.png",
             embeds: [{
                 author: {
