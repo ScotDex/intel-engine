@@ -86,7 +86,6 @@ function startWebServer(esi, statsManager, sharedState, getProcessor) {
     }
   });
 
-  // Kill detail JSON API — supports both /api/kill/:killID and /api/kill/:date/:killID
   async function handleKillDetail(req, res) {
     let date, id;
 
@@ -180,7 +179,7 @@ function startWebServer(esi, statsManager, sharedState, getProcessor) {
         fittedValue: zkb?.fittedValue ? helpers.formatIsk(zkb.fittedValue) : null,
         items,
         victim: {
-          name: victimName ? victimName : victimCorp,
+          name: (victimName === "Unknown" || !victimName) ? victimCorp : victimName,
           characterID: victim.character_id,
           corp: victimCorp,
           corporationID: victim.corporation_id,

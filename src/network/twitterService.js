@@ -2,8 +2,12 @@ require(`dotenv`).config();
 const { TwitterApi } = require(`twitter-api-v2`)
 const { AtpAgent } = require('@atproto/api');
 const helpers = require('../core/helpers');
+const { createRestAPIClient } = require('masto');
 
-
+const mastodon = createRestAPIClient({
+    url: process.env.MASTODON_INSTANCE,
+    accessToken: process.env.MASTODON_ACCESS_TOKEN,
+})
 
 const twitterClient = new TwitterApi({
     appKey: process.env.TWITTER_API_KEY,
@@ -19,7 +23,7 @@ agent.login({
 }).then(() => {
     console.log(`[BLUESKY] Logged in as ${process.env.BLUESKY_IDENTIFIER}`);
 }).catch((err) => {
-    console.error(`[BLUESKY] Login failed: ${err.message}`);
+    console.error(`[BLUESKY] Login failed: ${err.message}`); z
 });
 
 class TwitterService {
@@ -48,4 +52,5 @@ class BlueSkyService {
         }
     }
 }
+
 module.exports = { TwitterService, BlueSkyService };

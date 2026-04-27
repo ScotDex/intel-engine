@@ -1,4 +1,4 @@
-const { TwitterService, BlueSkyService } = require("../network/twitterService");
+const { TwitterService, BlueSkyService, MastadonService } = require("../network/twitterService");
 const CorpIntelFactory = require("../services/corpIntelFactory");
 const axios = require("../network/agent");
 const helpers = require("../core/helpers");
@@ -46,10 +46,10 @@ async function postNewsChannel(kill, zkb, names, category) {
     const urlList = Array.isArray(urls) ? urls : [urls];
 
     const payload = TRACKER_CATEGORIES.has(category)
-       ? NewsEmbedFactory.createActivityEmbed(kill, zkb, names, category)
-       : NewsEmbedFactory.createEmbed(kill, zkb, names, category);
-    
-    
+        ? NewsEmbedFactory.createActivityEmbed(kill, zkb, names, category)
+        : NewsEmbedFactory.createEmbed(kill, zkb, names, category);
+
+
     await Promise.all(
         urlList.map(async url => {
             await webhookSpacer();
