@@ -1,4 +1,4 @@
-const { TwitterService, BlueSkyService, MastadonService } = require("../network/twitterService");
+const { TwitterService, BlueSkyService } = require("../network/twitterService");
 const CorpIntelFactory = require("../services/corpIntelFactory");
 const axios = require("../network/agent");
 const helpers = require("../core/helpers");
