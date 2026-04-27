@@ -10,6 +10,12 @@ class atOfficerFactory {
         const triggerAttacker = kill.attackers?.find(a =>
             AT_SHIP_IDS.has(a.ship_type_id) || OFFICER_SHIP_IDS.has(a.ship_type_id) || RORQUAL_SHIP_IDS.has(a.ship_type_id)
         );
+
+        console.log({
+            triggerShipId: names.triggerShipId,
+            actualShipId: triggerAttacker?.ship_type_id,
+            shipName: names.triggerShipName,
+        });
         return {
             username: "Target Ship Tracker",
             avatar_url: corpIcon,
