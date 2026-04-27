@@ -11,11 +11,7 @@ class atOfficerFactory {
             AT_SHIP_IDS.has(a.ship_type_id) || OFFICER_SHIP_IDS.has(a.ship_type_id) || RORQUAL_SHIP_IDS.has(a.ship_type_id)
         );
 
-        console.log({
-            triggerShipId: names.triggerShipId,
-            actualShipId: triggerAttacker?.ship_type_id,
-            shipName: names.triggerShipName,
-        });
+      
         return {
             username: "Target Ship Tracker",
             avatar_url: corpIcon,
@@ -32,7 +28,7 @@ class atOfficerFactory {
                     { name: "Region", value: `**[${names.regionName}](${DOTLAN_BASE}/region/${names.regionName.replace(/ /g, '_')})** `, inline: false },
                     { name: "Pilot", value: names.triggerCharName ? `**[${names.triggerCharName}](${ZKILL_BASE}/character/${triggerAttacker?.character_id}/)**` : 'Unknown', inline: false },
                     { name: "Corporation", value: names.triggerCorpName ? `**[${names.triggerCorpName}](${ZKILL_BASE}/corporation/${triggerAttacker?.corporation_id}/)**` : 'Unknown', inline: false },
-                    { name: "Alliance", value: names.allianceName ? `**[${names.allianceName}](${ZKILL_BASE}/alliance/${triggerAttacker?.alliance_id}/)**` : "Unaffiliated", inline: false },
+                    { name: "Alliance", value: names.allianceName ? `**[${names.allianceName}](${ZKILL_BASE}/alliance/${triggerAttacker?.alliance_id}/)**` : "No Alliance", inline: false },
                     { name: "Total Value", value: `**${helpers.formatIsk(zkb.totalValue)} ISK**`, inline: false },
                 ],
                 footer: {

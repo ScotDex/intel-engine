@@ -13,6 +13,7 @@ let channels = {};
 const WHALE_THRESHOLD = 20000000000;
 const VALUE_1B = 1000000000;
 const VALUE_10B = 10000000000;
+const VALUE_100M = 100_000_000;
 
 async function loadChannels() {
     try {
@@ -71,7 +72,6 @@ module.exports = async (killmail, zkb, names) => {
         await new Promise(resolve => setTimeout(resolve, 2000));
     }
 
-    await postNewsChannel(killmail, zkb, names, 'all_kills');
 
     // Centralized Dispatcher
     const categoryPosts = [];
@@ -80,6 +80,7 @@ module.exports = async (killmail, zkb, names) => {
     if (isRorqual) categoryPosts.push(postNewsChannel(killmail, zkb, names, 'rorqual_activity'));
     if (names.rawValue >= VALUE_1B) categoryPosts.push(postNewsChannel(killmail, zkb, names, 'value_1b'));
     if (names.rawValue >= VALUE_10B) categoryPosts.push(postNewsChannel(killmail, zkb, names, 'value_10b'));
+    if (names.rawValue >= VALUE_100M) categoryPosts.push(postNewsChannel(killmail, zkb, names, 'all_kills'));
     if (TITAN_SHIP_IDS.has(killmail.victim?.ship_type_id)) categoryPosts.push(postNewsChannel(killmail, zkb, names, 'titan_loss'));
     if (SUPER_SHIP_IDS.has(killmail.victim?.ship_type_id)) categoryPosts.push(postNewsChannel(killmail, zkb, names, 'super_loss'));
     if (TRIGLAVIAN_SYSTEMS.has(killmail.solar_system_id)) categoryPosts.push(postNewsChannel(killmail, zkb, names, 'pochven'));
