@@ -10,7 +10,7 @@ const SLOT_GROUPS = {
     drone: [87],
     cargo: [5],
     fighter: [158, 159, 160],
-    implant: [89, 90, 91]
+    implant: [89]
 };
 
 function groupForFlag(flag) {
