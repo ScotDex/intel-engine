@@ -3,7 +3,6 @@ const { TwitterApi } = require(`twitter-api-v2`)
 const { AtpAgent } = require('@atproto/api');
 const helpers = require('../core/helpers');
 
-const API_BASE = `https://api.socketkill.com/render/`;
 const twitterClient = new TwitterApi({
     appKey: process.env.TWITTER_API_KEY,
     appSecret: process.env.TWITTER_API_SECRET,
