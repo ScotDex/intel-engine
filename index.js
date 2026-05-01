@@ -285,7 +285,7 @@ async function startPoller() {
   await esi.loadCache(path.join(__dirname, "data", "esi_cache.json"));
   await statsManager.recoverFromR2();
   await loadMarketPrices();
-  await esi.loadSystems();
+  await esi.loadSystemCache();
   setInterval(syncMarketPrices, 60_000);
   processor = ProcessorFactory(esi, io, statsManager);
   await hashCache.prime();                                 
