@@ -15,7 +15,7 @@ const kv = require('./src/network/kvClient');
 
 // --- Constants ---
 
-const esi = new ESIClient("Contact: @ScottishDex");
+const esi = ESIClient("Contact: @ScottishDex");
 const R2_BASE_URL = process.env.R2_BASE_URL;
 const SEQUENCE_CACHE_URL = `${R2_BASE_URL}/sequence.json`;
 const NEBULA_ROTATION_MS = 10 * 60 * 1000;
