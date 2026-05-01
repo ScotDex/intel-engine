@@ -188,7 +188,11 @@ class ESIClient {
     }
 
     getSystemDetails(id) {
-        return this.staticSystemData[id] || null;
+        const result = this.staticSystemData[id] || null;
+        if (!result) {
+            console.log('[SYS MISS]', id, typeof id, 'has 30000142?', !!this.staticSystemData['30000142']);
+        }
+        return result;
     }
 
     async getRegionName(id) {
