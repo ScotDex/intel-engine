@@ -11,6 +11,7 @@ const r2 = require("./src/network/r2Writer");
 const hashCache = require("./src/state/hashCache")
 const { syncMarketPrices, loadMarketPrices } = require("./src/services/priceService");
 const kv = require('./src/network/kvClient');
+const systems = require ('./data/systems.json')
 
 // --- Constants ---
 
@@ -28,6 +29,12 @@ const GHOST_SKIP_AFTER = 5;       // skip a sequence after N normalizer failures
 const DEDUP_MAX = 5000;           // dedup set ceiling before pruning
 const MAX_KILL_AGE_MS = 24 * 60 * 60 * 1000;
 const STATE_PERSIST_INTERVAL = 50;
+
+
+(async () => {
+    await kv.put('systems:all', systems);
+    console.log(`Uploaded ${Object.keys(systems).length} systems to KV`);
+})();
 
 // --- Shared State (single source of truth) ---
 
@@ -278,4 +285,5 @@ async function startPoller() {
   syncPlayerCount();
   setInterval(refreshNebulaBackground, NEBULA_ROTATION_MS);
   startPoller();
+  
 })();
