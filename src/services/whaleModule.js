@@ -120,14 +120,12 @@ async function postOfficerIntel(kill, zkb, names) {
 }
 
 async function postSocial(names, formattedValue, killmailId) {
-    const results = await Promise.allSettled([
-        TwitterService.postWhale(names, formattedValue, killmailId),
-        BlueSkyService.postWhale(names, formattedValue, killmailId)
-    ]);
-    results.forEach((r, i) => {
-        if (r.status === 'rejected') {
-            const platform = i === 0 ? 'Twitter' : 'Bluesky';
-            console.error(`[SOCIAL] ${platform} post failed for kill ${killmailId}: ${r.reason?.message}`);
-        }
-    });
+    try {
+        await Promise.all([
+            TwitterService.postWhale(names, formattedValue, killmailId),
+            BlueSkyService.postWhale(names, formattedValue, killmailId)
+        ]);
+    } catch (err) {
+        console.error(`[SOCIAL MEDIA POST] Post failed: ${err.message}`);
+    }
 }
