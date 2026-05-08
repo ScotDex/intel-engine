@@ -81,4 +81,8 @@ async function getHashFromShard(date, killID) {
     return shard[killID] || shard[String(killID)] || null;
 }
 
-module.exports = { prime, set, get, flush, rotateIfNeeded, getHashFromShard };
+function getAllToday(){
+    return Array.from (cache.entries()).map(([killID, hash]) => [String(killID), hash]);
+}
+
+module.exports = { prime, set, get, flush, rotateIfNeeded, getHashFromShard, getAllToday };
