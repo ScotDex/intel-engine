@@ -240,8 +240,6 @@ function startWebServer(esi, statsManager, sharedState, getProcessor) {
 
     console.log(`[LOG API] Request for ${date}${isToday ? ' (today)' : ''}`);
 
-    console.log(`[LOG API] Request for ${date}${isToday ? ' (today)' : ''}`);
-
     try {
       // Get killID → hash entries for the day
       let entries;

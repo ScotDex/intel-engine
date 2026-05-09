@@ -30,17 +30,17 @@ const MAX_KILL_AGE_MS = 24 * 60 * 60 * 1000;
 const STATE_PERSIST_INTERVAL = 50;
 
 
-let systems = null; 
+let systems = null;
 
 //(async () => {
-   // await kv.put('systems:all', systems);
- //   console.log(`Uploaded ${Object.keys(systems).length} systems to KV`);
+// await kv.put('systems:all', systems);
+//   console.log(`Uploaded ${Object.keys(systems).length} systems to KV`);
 // })();
 
 async function loadSystems() {
-    systems = await kv.get('systems:all');
-    if (!systems) throw new Error('systems:all missing from KV');
-    console.log(`Loaded ${Object.keys(systems).length} systems from KV`);
+  systems = await kv.get('systems:all');
+  if (!systems) throw new Error('systems:all missing from KV');
+  console.log(`Loaded ${Object.keys(systems).length} systems from KV`);
 }
 
 
@@ -294,7 +294,7 @@ async function shutdown(signal) {
 }
 
 process.on("SIGTERM", () => shutdown("SIGTERM"));
-process.on("SIGINT",  () => shutdown("SIGINT"));
+process.on("SIGINT", () => shutdown("SIGINT"));
 
 // --- Boot ---
 (async () => {
@@ -302,15 +302,16 @@ process.on("SIGINT",  () => shutdown("SIGINT"));
   // await esi.loadSystemCache("./data/systems.json");
   await esi.loadCache(path.join(__dirname, "data", "esi_cache.json"));
   await statsManager.recoverFromR2();
+  setInterval(() => statsManager.save(), 60_000);
   await loadMarketPrices();
   await esi.loadSystemCache();
   setInterval(syncMarketPrices, 60_000);
   processor = ProcessorFactory(esi, io, statsManager);
-  await hashCache.prime();                                 
+  await hashCache.prime();
   setInterval(() => hashCache.rotateIfNeeded(), 60_000);
   refreshNebulaBackground();
   syncPlayerCount();
   setInterval(refreshNebulaBackground, NEBULA_ROTATION_MS);
   startPoller();
-  
+
 })();
