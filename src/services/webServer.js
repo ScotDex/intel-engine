@@ -255,7 +255,7 @@ function startWebServer(esi, statsManager, sharedState, getProcessor) {
       }
 
 
-      const capped = entries.slice(-1000).reverse();
+      const capped = entries.slice(-200).reverse();
       const hasMore = entries.length > 200;
 
 
