@@ -1,6 +1,7 @@
 require("dotenv").config();
 const axios = require("../network/agent");
 const fs = require("fs");
+const { version } = require("os");
 const path = require("path");
 const DATA_PATH = path.join(process.cwd(), "data", "stats.json");
 const FIN_PATH = path.join(process.cwd(), "data", "financials.json");
@@ -42,11 +43,16 @@ class utils {
 
   static async getPlayerCount() {
     try {
-      const url = "https://api.socketkill.com/eve/status";
-      const response = await axios.get(url);
+      const url = "https://esi.evetech.net/latest/status/";
+      const response = await axios.get(url, {
+        headers: { 'User-Agent': 'Socket.Kill / Dexomus Viliana (https://socketkill.com)' },
+        timeout: 5000,
+      });
 
       return {
         count: response.data.players,
+        version: response.data.server_version,
+        vip: response.data.vip === true,
         active: true,
       };
     } catch (err) {
