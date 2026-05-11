@@ -1,4 +1,5 @@
 const talker = require("../network/agent");
+const r2 = require("../network/r2Writer");
 
 const MAX_ENTRIES = 5000;
 const ESI_BASE = "https://esi.evetech.net/latest/killmails";
@@ -30,8 +31,15 @@ function lruSet(killID, value) {
 }
 
 async function fetchFromESI(killID, hash) {
+    const cached = await r2.get(`killmails/${killID}.json`);
+    if (cached) return cached;
+
     const url = `${ESI_BASE}/${killID}/${hash}/`;
-    const res = await talker.get(url, { headers: ESI_HEADERS, timeout: 5000 });
+    const res = await talker.get (url, { headers: ESI_HEADERS, timeout: 5000 });
+
+        r2.put(`killmails/${killID}.json`, res.data).catch(err =>
+        console.warn(`[KILLCACHE] R2 persist failed for ${killID}: ${err.message}`));
+
     return res.data;
 }
 
