@@ -228,7 +228,7 @@ function startWebServer(esi, statsManager, sharedState, getProcessor) {
   app.get('/api/kill/:killID', handleKillDetail);
   app.get('/api/kill/:date/:killID', handleKillDetail);
 
-    app.get('/api/kills/:date', async (req, res) => {
+  app.get('/api/kills/:date', async (req, res) => {
     const { date } = req.params;
     if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
       return res.status(400).json({ error: 'Invalid date format. Use YYYY-MM-DD.' });
@@ -242,7 +242,6 @@ function startWebServer(esi, statsManager, sharedState, getProcessor) {
     console.log(`[LOG API] Request for ${date}${isToday ? ' (today)' : ''}`);
 
     try {
-      // Get killID → hash entries for the day
       let entries;
       if (isToday) {
         entries = hashCache.getAllToday();
@@ -252,15 +251,21 @@ function startWebServer(esi, statsManager, sharedState, getProcessor) {
       }
 
       if (!entries.length) {
-        return res.json({ date, count: 0, total: 0, hasMore: false, kills: [] });
+        return res.json({ date, count: 0, total: 0, hasMore: false, hasPrev: false, kills: [] });
       }
 
+      const page = Math.max(1, parseInt(req.query.page) || 1);
+      const PAGE_SIZE = 200;
+      const start = (page - 1) * PAGE_SIZE;
+      const end = start + PAGE_SIZE;
 
-      const capped = entries.slice(-200).reverse();
-      const hasMore = entries.length > 200;
+      const reversed = [...entries].reverse();
+      const capped = reversed.slice(start, end);
+      const hasMore = reversed.length > end;
+      const hasPrev = page > 1;
 
       const limit = pLimit(5);
-      const kills = await Promise.all(capped.map(async ([killID, hash]) =>  limit(async () => {
+      const kills = await Promise.all(capped.map(async ([killID, hash]) => limit(async () => {
         try {
           const km = await killmailCache.get(parseInt(killID), hash);
           if (!km) return null;
@@ -319,9 +324,12 @@ function startWebServer(esi, statsManager, sharedState, getProcessor) {
 
       res.json({
         date,
+        page,
+        pageSize: PAGE_SIZE,
         count: validKills.length,
         total: entries.length,
         hasMore,
+        hasPrev,
         kills: validKills,
       });
 
