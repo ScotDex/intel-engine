@@ -12,6 +12,7 @@ const hashCache = require("./src/state/hashCache")
 const { syncMarketPrices, loadMarketPrices } = require("./src/services/priceService");
 const kv = require('./src/network/kvClient');
 //const systems = require ('./data/systems.json')
+const todayStats = require("./src/state/todayStats");
 
 // --- Constants ---
 
@@ -81,6 +82,7 @@ io.on("connection", async (socket) => {
     totalScanned: statsManager.getTotal(),
     totalIsk: statsManager.totalIsk,
   });
+  socket.emit("today-stats", await buildTodayStatsPayload());
 
   const playerCount = await utils.getPlayerCount();
   if (playerCount) socket.emit("player-count", playerCount);
@@ -296,10 +298,29 @@ async function shutdown(signal) {
 process.on("SIGTERM", () => shutdown("SIGTERM"));
 process.on("SIGINT", () => shutdown("SIGINT"));
 
-// --- Boot ---
+async function buildTodayStatsPayload() {
+  const top = todayStats.topN(25);
+  const withNames = await Promise.all(
+    top.map(async ([typeID, count]) => ({
+      typeID,
+      count,
+      name: await esi.getTypeName(typeID),
+    }))
+  );
+  return { ships: withNames };
+}
+
+async function emitTodayStats() {
+  try {
+    const payload = await buildTodayStatsPayload();
+    io.emit('today-stats', payload);
+  } catch (err) {
+    console.warn(`[TODAY] Emit failed: ${err.message}`);
+  }
+}
+
 (async () => {
   console.log("Initializing Socket.Kill...");
-  // await esi.loadSystemCache("./data/systems.json");
   await esi.loadCache(path.join(__dirname, "data", "esi_cache.json"));
   await statsManager.recoverFromR2();
   setInterval(() => statsManager.save(), 60_000);
@@ -309,9 +330,14 @@ process.on("SIGINT", () => shutdown("SIGINT"));
   processor = ProcessorFactory(esi, io, statsManager);
   await hashCache.prime();
   setInterval(() => hashCache.rotateIfNeeded(), 60_000);
+
+  await todayStats.prime();
+  setInterval(() => todayStats.snapshot(), 60_000);
+  setInterval(() => todayStats.rotateIfNeeded(), 60_000);
+  setInterval(emitTodayStats, 5_000);
+
   refreshNebulaBackground();
   syncPlayerCount();
   setInterval(refreshNebulaBackground, NEBULA_ROTATION_MS);
   startPoller();
-
 })();

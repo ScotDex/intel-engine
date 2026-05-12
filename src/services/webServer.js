@@ -250,8 +250,17 @@ function startWebServer(esi, statsManager, sharedState, getProcessor) {
         entries = shard ? Object.entries(shard) : [];
       }
 
-      if (!entries.length) {
-        return res.json({ date, count: 0, total: 0, hasMore: false, hasPrev: false, kills: [] });
+if (!entries.length) {
+        return res.json({ date, count: 0, total: 0, hasMore: false, hasPrev: false, kills: [], shipFilter: null });
+      }
+
+      const shipFilter = req.query.ship ? parseInt(req.query.ship) : null;
+
+      if (shipFilter) {
+        entries = entries.filter(([, value]) => {
+          const shipID = typeof value === 'object' ? value.shipID : null;
+          return shipID === shipFilter;
+        });
       }
 
       const page = Math.max(1, parseInt(req.query.page) || 1);
@@ -263,10 +272,10 @@ function startWebServer(esi, statsManager, sharedState, getProcessor) {
       const capped = reversed.slice(start, end);
       const hasMore = reversed.length > end;
       const hasPrev = page > 1;
-
       const limit = pLimit(5);
-      const kills = await Promise.all(capped.map(async ([killID, hash]) => limit(async () => {
+      const kills = await Promise.all(capped.map(async ([killID, value]) => limit(async () => {
         try {
+          const hash = typeof value === 'object' ? value.hash : value;
           const km = await killmailCache.get(parseInt(killID), hash);
           if (!km) return null;
 
@@ -330,6 +339,7 @@ function startWebServer(esi, statsManager, sharedState, getProcessor) {
         total: entries.length,
         hasMore,
         hasPrev,
+        shipFilter,
         kills: validKills,
       });
 

@@ -3,17 +3,19 @@ const handleWhale = require("../services/whaleModule");
 const { resolveKillmail, resolveFinalBlowCorp, resolveTriggerAttacker } = require('./processorHelpers');
 const { TRIGLAVIAN_SYSTEMS } = require('../core/shipIDs');
 const hashCache = require('../state/hashCache')
+const todayStats = require('../state/todayStats');
 
 module.exports = (esi, io, statsManager) => {
     async function processPackage(packageData) {
         const startProcessing = process.hrtime.bigint();
-        const { zkb, killID, isR2, esiData, hash } = packageData;
-
-        if (hash) hashCache.set(killID, hash);
+          const { zkb, killID, isR2, esiData, hash } = packageData;
 
         try {
             const killmail = await resolveKillmail(isR2, esiData, zkb);
             const rawValue = Number(zkb.totalValue) || 0
+
+            if (hash) hashCache.set(killID, hash, killmail?.victim?.ship_type_id);
+            todayStats.increment(killmail?.victim?.ship_type_id);
             //
 
             const [systemDetails, shipName, charName, corpName, finalBlowCorp, allianceName] = await Promise.all([
